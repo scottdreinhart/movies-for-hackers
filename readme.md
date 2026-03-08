@@ -5,6 +5,7 @@
 **A curated list of movies every hacker & cyberpunk fan must watch.**
 
 [![Built with React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Electron](https://img.shields.io/badge/Electron-40-47848F?logo=electron&logoColor=white)](https://www.electronjs.org/)
 [![Capacitor](https://img.shields.io/badge/Capacitor-8-119EFF?logo=capacitor&logoColor=white)](https://capacitorjs.com/)
@@ -47,7 +48,7 @@ A cross-platform interactive viewer for a curated collection of **401 movies, TV
 - **Skip navigation** — keyboard-accessible skip-to-content link
 - **Responsive design** — adapts from desktop to mobile
 - **Theme system** — dark/light/system mode toggle with colorblind-safe palettes (protanopia, deuteranopia, tritanopia)
-- **PropTypes validation** — runtime prop-type checking on all components (dev mode)
+- **Strict TypeScript** — full type annotations on all components, hooks, services, and utilities
 - **Accessible by default** — `prefers-reduced-motion`, `forced-colors`, `aria-live` announcements, print stylesheet
 
 ---
@@ -117,6 +118,7 @@ All scripts are run via `pnpm <script>`.
 
 | Script         | Description                                  |
 | -------------- | -------------------------------------------- |
+| `typecheck`    | Run TypeScript type checker (`tsc --noEmit`) |
 | `lint`         | Run ESLint on `src/`                         |
 | `lint:fix`     | Run ESLint with auto-fix                     |
 | `format`       | Format source files with Prettier            |
@@ -180,6 +182,7 @@ movies-for-hackers/
 ├── movie_list.md               # Curated movie data (401 entries)
 ├── package.json                # Project config + Electron builder config
 ├── vite.config.js              # Vite + SWC, virtual movie-data plugin, vendor chunks
+├── tsconfig.json               # TypeScript strict config
 ├── capacitor.config.json       # Capacitor native app config
 ├── eslint.config.js            # ESLint flat config
 ├── .prettierrc                 # Prettier config
@@ -196,8 +199,12 @@ movies-for-hackers/
 │   └── main.cjs                # Electron main process (security-hardened)
 │
 ├── src/
-│   ├── main.jsx                # React entry point
-│   ├── App.jsx                 # Root component with ErrorBoundary
+│   ├── main.tsx                # React entry point
+│   ├── App.tsx                 # Root component with ErrorBoundary
+│   │
+│   ├── types/                  # TypeScript type definitions
+│   │   ├── index.ts            # Shared interfaces & type aliases
+│   │   └── declarations.d.ts   # CSS Modules + virtual module declarations
 │   │
 │   ├── components/             # Atomic Design hierarchy
 │   │   ├── atoms/              # UI primitives
@@ -229,26 +236,26 @@ movies-for-hackers/
 │   │       └── HomePage/       # Main page (data → UI wiring)
 │   │
 │   ├── constants/              # Static configuration
-│   │   ├── sectionMeta.js      # Section names, colors, column defs, filter options
-│   │   └── themeMeta.js        # Theme modes, palettes, labels
+│   │   ├── sectionMeta.ts      # Section names, colors, column defs, filter options
+│   │   └── themeMeta.ts        # Theme modes, palettes, labels
 │   │
 │   ├── hooks/                  # Custom React hooks
-│   │   ├── useDebouncedInput.js# Debounced text input with external sync
-│   │   ├── useDpadNavigation.js# D-pad / arrow-key / remote navigation
-│   │   ├── useFilterCallbacks.js# Factory hook for per-key filter callbacks
-│   │   ├── useFilters.js       # Filter state, derived data, single-pass metadata
-│   │   ├── useHapticCallback.js# Wraps callbacks with haptic feedback
-│   │   ├── useKeyboardShortcut.js# Global keyboard shortcut registration
-│   │   ├── useLiveAnnouncer.js # Debounced aria-live message for screen readers
-│   │   ├── useMovieData.js     # Build-time JSON (prod) / fetch+parse (dev)
-│   │   ├── useSort.js          # Sort state & logic
-│   │   ├── useTheme.js         # Dark/light/system mode + palette (localStorage)
-│   │   └── useWatched.js       # Watched checkbox state (localStorage)
+│   │   ├── useDebouncedInput.ts# Debounced text input with external sync
+│   │   ├── useDpadNavigation.ts# D-pad / arrow-key / remote navigation
+│   │   ├── useFilterCallbacks.ts# Factory hook for per-key filter callbacks
+│   │   ├── useFilters.ts       # Filter state, derived data, single-pass metadata
+│   │   ├── useHapticCallback.ts# Wraps callbacks with haptic feedback
+│   │   ├── useKeyboardShortcut.ts# Global keyboard shortcut registration
+│   │   ├── useLiveAnnouncer.ts # Debounced aria-live message for screen readers
+│   │   ├── useMovieData.ts     # Build-time JSON (prod) / fetch+parse (dev)
+│   │   ├── useSort.ts          # Sort state & logic
+│   │   ├── useTheme.ts         # Dark/light/system mode + palette (localStorage)
+│   │   └── useWatched.ts       # Watched checkbox state (localStorage)
 │   │
 │   ├── services/               # Data processing & platform services
-│   │   ├── markdownParser.js   # Markdown → structured data parser (shared by Vite plugin)
-│   │   ├── registerSW.js       # Service worker registration for PWA
-│   │   └── storageService.js   # localStorage abstraction for persistence
+│   │   ├── markdownParser.ts   # Markdown → structured data parser (shared by Vite plugin)
+│   │   ├── registerSW.ts       # Service worker registration for PWA
+│   │   └── storageService.ts   # localStorage abstraction for persistence
 │   │
 │   ├── styles/                 # Global styles
 │   │   ├── variables.css       # CSS custom properties (dark/light palettes, colorblind, forced-colors, print, reduced-motion)
@@ -256,10 +263,10 @@ movies-for-hackers/
 │   │   └── inputs.module.css   # Shared input base class
 │   │
 │   └── utils/                  # Pure utility functions
-│       ├── haptics.js          # Cross-platform haptic feedback (vibrate API)
-│       ├── ratingUtils.js      # Rating tier/color helpers
-│       ├── searchUtils.js      # WeakMap haystack cache + search matching
-│       └── sortUtils.js        # Sort comparison with article stripping
+│       ├── haptics.ts          # Cross-platform haptic feedback (vibrate API)
+│       ├── ratingUtils.ts      # Rating tier/color helpers
+│       ├── searchUtils.ts      # WeakMap haystack cache + search matching
+│       └── sortUtils.ts        # Sort comparison with article stripping
 │
 └── .github/
     ├── workflows/
@@ -341,13 +348,13 @@ See [contributing.md](contributing.md) for full guidelines on adding movies and 
 | Technology                                                | Purpose                                           |
 | --------------------------------------------------------- | ------------------------------------------------- |
 | [React 18](https://reactjs.org/)                          | UI library                                        |
+| [TypeScript 5.9](https://www.typescriptlang.org/)         | Static type checking (strict mode)                |
 | [Vite 6](https://vitejs.dev/)                             | Build tool & dev server (SWC)                     |
 | [@tanstack/react-virtual](https://tanstack.com/virtual)   | Row virtualization                                |
 | [Electron 40](https://www.electronjs.org/)                | Desktop app wrapper                               |
 | [Capacitor 8](https://capacitorjs.com/)                   | Native mobile/tablet apps                         |
 | [electron-builder](https://www.electron.build/)           | Desktop packaging & installers                    |
-| [ESLint 10](https://eslint.org/)                          | Linting (flat config, react-hooks, react-refresh) |
-| [prop-types 15](https://github.com/facebook/prop-types)    | Runtime prop-type validation                      |
+| [ESLint 10](https://eslint.org/)                          | Linting (flat config, typescript-eslint, react-hooks) |
 | [Prettier 3](https://prettier.io/)                        | Code formatting                                   |
 | [CSS Modules](https://github.com/css-modules/css-modules) | Scoped component styling                          |
 | [GitHub Actions](https://github.com/features/actions)     | CI pipeline (lint + build)                        |
@@ -357,9 +364,9 @@ See [contributing.md](contributing.md) for full guidelines on adding movies and 
 
 | Chunk              | Size      | Gzipped  |
 | ------------------ | --------- | -------- |
-| vendor-react       | 142.90 KB | 45.76 KB |
+| vendor-react       | 142.79 KB | 45.72 KB |
 | virtual:movie-data | 102.88 KB | 21.52 KB |
-| index (app)        | 26.24 KB  | 9.44 KB  |
+| index (app)        | 22.48 KB  | 8.45 KB  |
 | vendor-virtual     | 16.26 KB  | 5.15 KB  |
 | CSS                | 16.32 KB  | 4.06 KB  |
 

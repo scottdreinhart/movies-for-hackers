@@ -26,7 +26,7 @@ function movieDataPlugin() {
     },
     async load(id) {
       if (id !== resolvedVirtualId) return;
-      const { parseMarkdown } = await import('./src/services/markdownParser.js');
+      const { parseMarkdown } = await import('./src/services/markdownParser.ts');
       const md = readFileSync(mdPath, 'utf-8');
       const entries = parseMarkdown(md);
       return `export default ${JSON.stringify(entries)};`;
