@@ -163,11 +163,11 @@ All scripts are run via `pnpm <script>`.
 | ---------------------- | ---------- | ----------------------------------------- |
 | `electron:dev`         | Any        | Start Vite + open Electron window         |
 | `electron:dev:win`     | PowerShell | Setup Windows modules + Electron dev      |
-| `electron:build`       | Any        | Build for current platform                |
-| `electron:build:win`   | PowerShell | Setup + build Windows installer (NSIS)    |
-| `electron:build:linux` | WSL/Ubuntu | Setup + build Linux packages (AppImage)   |
-| `electron:build:mac`   | macOS      | Build macOS installer (DMG)               |
-| `electron:build:all`   | Any        | Build for all platforms                   |
+| `electron:build`       | Any        | Clean + build + package for current platform |
+| `electron:build:win`   | PowerShell | Setup + clean + build + Windows installer    |
+| `electron:build:linux` | WSL/Ubuntu | Setup + clean + build + Linux packages       |
+| `electron:build:mac`   | macOS      | Clean + build + macOS installer (DMG)        |
+| `electron:build:all`   | Any        | Clean + build + package all platforms        |
 
 Output goes to `release/`.
 

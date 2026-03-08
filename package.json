@@ -34,11 +34,11 @@
 
     "electron:dev": "concurrently -k \"vite\" \"wait-on http://localhost:5175 && electron .\"",
     "electron:dev:win": "pnpm setup:win && pnpm electron:dev",
-    "electron:build": "pnpm build && electron-builder",
-    "electron:build:win": "pnpm setup:win && pnpm build && electron-builder --win",
-    "electron:build:linux": "pnpm setup:linux && pnpm build && electron-builder --linux",
-    "electron:build:mac": "pnpm build && electron-builder --mac",
-    "electron:build:all": "pnpm build && electron-builder --win --linux --mac",
+    "electron:build": "pnpm clean && pnpm build && electron-builder",
+    "electron:build:win": "pnpm setup:win && pnpm clean && pnpm build && electron-builder --win",
+    "electron:build:linux": "pnpm setup:linux && pnpm clean && pnpm build && electron-builder --linux",
+    "electron:build:mac": "pnpm clean && pnpm build && electron-builder --mac",
+    "electron:build:all": "pnpm clean && pnpm build && electron-builder --win --linux --mac",
 
     "cap:sync": "pnpm build && npx cap sync",
     "cap:init:android": "npx cap add android",
