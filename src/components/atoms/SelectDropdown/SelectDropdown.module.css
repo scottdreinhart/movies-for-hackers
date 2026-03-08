@@ -1,0 +1,5 @@
+.select {
+  composes: baseInput from '../../../styles/inputs.module.css';
+  cursor: pointer;
+  max-width: 200px;
+}

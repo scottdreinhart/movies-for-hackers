@@ -1,0 +1,37 @@
+# Build output
+dist/
+release/
+
+# Dependencies
+node_modules/
+
+# Capacitor native projects
+android/
+ios/
+
+# Electron
+electron/out/
+
+# Vite cache
+.vite/
+
+# Environment & local config
+*.local
+.env
+.env.*
+
+# Logs
+pnpm-debug.log*
+npm-debug.log*
+
+# IDE
+.idea/
+*.swp
+
+# OS
+.DS_Store
+*/.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.tgz

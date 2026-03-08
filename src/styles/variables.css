@@ -1,0 +1,338 @@
+/* =============================================================================
+   Theme Variables
+   Supports: dark/light modes, colorblind palettes, forced-colors, print
+   Mode:    [data-theme-mode="dark"|"light"] on <html>
+   Palette: [data-theme-palette="default"|"protanopia"|"deuteranopia"|"tritanopia"]
+   ============================================================================= */
+
+/* --- Dark mode (default) -------------------------------------------------- */
+:root,
+[data-theme-mode='dark'] {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #1c2129;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --accent: #58a6ff;
+  --accent2: #3fb950;
+  --accent3: #d2a8ff;
+  --accent4: #f0883e;
+  --danger: #f85149;
+  --pending: #d29922;
+  --rating-high: #3fb950;
+  --rating-mid: #d29922;
+  --rating-low: #f85149;
+
+  --accent-bg: rgba(88, 166, 255, 0.15);
+  --accent-bg-subtle: rgba(88, 166, 255, 0.1);
+  --accent-bg-faint: rgba(88, 166, 255, 0.04);
+  --danger-bg: rgba(248, 81, 73, 0.15);
+  --accent2-bg: rgba(63, 185, 80, 0.15);
+  --accent3-bg: rgba(210, 168, 255, 0.15);
+  --accent4-bg: rgba(240, 136, 62, 0.15);
+  --pending-bg: rgba(210, 153, 34, 0.15);
+
+  --header-gradient: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1a1e2e 100%);
+
+  color-scheme: dark;
+}
+
+/* --- Light mode ----------------------------------------------------------- */
+[data-theme-mode='light'] {
+  --bg: #ffffff;
+  --surface: #f6f8fa;
+  --surface2: #eaeef2;
+  --border: #d0d7de;
+  --text: #1f2328;
+  --text-dim: #656d76;
+  --accent: #0969da;
+  --accent2: #1a7f37;
+  --accent3: #8250df;
+  --accent4: #bc4c00;
+  --danger: #cf222e;
+  --pending: #9a6700;
+  --rating-high: #1a7f37;
+  --rating-mid: #9a6700;
+  --rating-low: #cf222e;
+
+  --accent-bg: rgba(9, 105, 218, 0.1);
+  --accent-bg-subtle: rgba(9, 105, 218, 0.06);
+  --accent-bg-faint: rgba(9, 105, 218, 0.03);
+  --danger-bg: rgba(207, 34, 46, 0.1);
+  --accent2-bg: rgba(26, 127, 55, 0.1);
+  --accent3-bg: rgba(130, 80, 223, 0.1);
+  --accent4-bg: rgba(188, 76, 0, 0.1);
+  --pending-bg: rgba(154, 103, 0, 0.1);
+
+  --header-gradient: linear-gradient(135deg, #ffffff 0%, #f6f8fa 50%, #eef1f6 100%);
+
+  color-scheme: light;
+}
+
+/* =============================================================================
+   Colorblind Palettes
+   Replace red/green signals with distinguishable alternatives.
+   Applied via [data-theme-palette] attribute.
+   ============================================================================= */
+
+/* --- Protanopia (red-blind): blue/orange/yellow scheme -------------------- */
+[data-theme-palette='protanopia'] {
+  --accent2: #56b4e9;
+  --accent4: #e69f00;
+  --danger: #d55e00;
+  --rating-high: #56b4e9;
+  --rating-mid: #e69f00;
+  --rating-low: #d55e00;
+
+  --danger-bg: rgba(213, 94, 0, 0.15);
+  --accent2-bg: rgba(86, 180, 233, 0.15);
+  --accent4-bg: rgba(230, 159, 0, 0.15);
+}
+
+[data-theme-mode='light'][data-theme-palette='protanopia'] {
+  --accent2: #0072b2;
+  --accent4: #b87301;
+  --danger: #a34400;
+  --rating-high: #0072b2;
+  --rating-mid: #b87301;
+  --rating-low: #a34400;
+
+  --danger-bg: rgba(163, 68, 0, 0.1);
+  --accent2-bg: rgba(0, 114, 178, 0.1);
+  --accent4-bg: rgba(184, 115, 1, 0.1);
+}
+
+/* --- Deuteranopia (green-blind): blue/orange/vermilion scheme ------------- */
+[data-theme-palette='deuteranopia'] {
+  --accent2: #56b4e9;
+  --accent4: #f0e442;
+  --danger: #d55e00;
+  --rating-high: #56b4e9;
+  --rating-mid: #f0e442;
+  --rating-low: #d55e00;
+
+  --danger-bg: rgba(213, 94, 0, 0.15);
+  --accent2-bg: rgba(86, 180, 233, 0.15);
+  --accent4-bg: rgba(240, 228, 66, 0.15);
+}
+
+[data-theme-mode='light'][data-theme-palette='deuteranopia'] {
+  --accent2: #0072b2;
+  --accent4: #9e9400;
+  --danger: #a34400;
+  --rating-high: #0072b2;
+  --rating-mid: #9e9400;
+  --rating-low: #a34400;
+
+  --danger-bg: rgba(163, 68, 0, 0.1);
+  --accent2-bg: rgba(0, 114, 178, 0.1);
+  --accent4-bg: rgba(158, 148, 0, 0.1);
+}
+
+/* --- Tritanopia (blue-blind): red/magenta/cyan scheme --------------------- */
+[data-theme-palette='tritanopia'] {
+  --accent: #cc79a7;
+  --accent2: #009e73;
+  --accent4: #d55e00;
+  --danger: #cc79a7;
+  --rating-high: #009e73;
+  --rating-mid: #d55e00;
+  --rating-low: #cc79a7;
+
+  --accent-bg: rgba(204, 121, 167, 0.15);
+  --danger-bg: rgba(204, 121, 167, 0.15);
+  --accent2-bg: rgba(0, 158, 115, 0.15);
+  --accent4-bg: rgba(213, 94, 0, 0.15);
+}
+
+[data-theme-mode='light'][data-theme-palette='tritanopia'] {
+  --accent: #882255;
+  --accent2: #007a5a;
+  --accent4: #a34400;
+  --danger: #882255;
+  --rating-high: #007a5a;
+  --rating-mid: #a34400;
+  --rating-low: #882255;
+
+  --accent-bg: rgba(136, 34, 85, 0.1);
+  --danger-bg: rgba(136, 34, 85, 0.1);
+  --accent2-bg: rgba(0, 122, 90, 0.1);
+  --accent4-bg: rgba(163, 68, 0, 0.1);
+}
+
+/* =============================================================================
+   Reduced Motion
+   Disables animations and transitions when user prefers reduced motion.
+   ============================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =============================================================================
+   Forced Colors / Windows High Contrast Mode
+   Ensures all UI elements remain visible and usable.
+   ============================================================================= */
+@media (forced-colors: active) {
+  :root {
+    --bg: Canvas;
+    --surface: Canvas;
+    --surface2: Canvas;
+    --border: ButtonBorder;
+    --text: CanvasText;
+    --text-dim: CanvasText;
+    --accent: LinkText;
+    --accent2: LinkText;
+    --accent3: LinkText;
+    --accent4: LinkText;
+    --danger: LinkText;
+    --pending: CanvasText;
+    --rating-high: CanvasText;
+    --rating-mid: CanvasText;
+    --rating-low: CanvasText;
+
+    --accent-bg: transparent;
+    --accent-bg-subtle: transparent;
+    --accent-bg-faint: transparent;
+    --danger-bg: transparent;
+    --accent2-bg: transparent;
+    --accent3-bg: transparent;
+    --accent4-bg: transparent;
+    --pending-bg: transparent;
+
+    --header-gradient: none;
+  }
+
+  /* Ensure visible borders on all interactive elements */
+  button,
+  input,
+  select {
+    border: 1px solid ButtonBorder !important;
+  }
+
+  /* Badges need borders to remain visible without background colors */
+  [class*='badge'] {
+    border: 1px solid CanvasText;
+  }
+
+  /* Rating bar track and fill need forced-color-adjust */
+  [role='meter'] {
+    forced-color-adjust: none;
+  }
+}
+
+/* =============================================================================
+   Print Stylesheet
+   Optimized layout for printing the movie list.
+   ============================================================================= */
+@media print {
+  :root {
+    --bg: #fff;
+    --surface: #fff;
+    --surface2: #f5f5f5;
+    --border: #ccc;
+    --text: #000;
+    --text-dim: #444;
+    --accent: #000;
+    --accent2: #333;
+    --accent3: #555;
+    --accent4: #333;
+    --danger: #000;
+    --pending: #555;
+    --rating-high: #000;
+    --rating-mid: #444;
+    --rating-low: #666;
+
+    --accent-bg: transparent;
+    --accent-bg-subtle: transparent;
+    --accent-bg-faint: transparent;
+    --danger-bg: transparent;
+    --accent2-bg: transparent;
+    --accent3-bg: transparent;
+    --accent4-bg: transparent;
+    --pending-bg: transparent;
+
+    --header-gradient: none;
+  }
+
+  body {
+    font-size: 10pt;
+    line-height: 1.3;
+    color: #000;
+    background: #fff;
+  }
+
+  /* Hide non-essential UI for print */
+  [class*='skipLink'],
+  [class*='controls'],
+  [class*='tabs'],
+  [class*='ThemePicker'],
+  [class*='checkbox'],
+  [class*='checkCell'],
+  [class*='watchedHeader'] {
+    display: none !important;
+  }
+
+  /* Remove sticky positioning */
+  header,
+  thead {
+    position: static !important;
+  }
+
+  /* Allow table to flow naturally */
+  [class*='container'] {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    border: none !important;
+  }
+
+  [class*='layout'] {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  [class*='main'] {
+    padding: 0 !important;
+  }
+
+  /* Show all rows (disable virtualization visually) */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  th,
+  td {
+    border: 1px solid #ccc;
+    padding: 4px 6px;
+    font-size: 9pt;
+  }
+
+  /* Links: show URL in print */
+  a[href]::after {
+    content: ' (' attr(href) ')';
+    font-size: 8pt;
+    color: #666;
+    word-break: break-all;
+  }
+
+  /* No background colors or gradients */
+  * {
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}

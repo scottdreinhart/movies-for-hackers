@@ -1,0 +1,9 @@
+.arrow {
+  margin-left: 0.3rem;
+  font-size: 0.65rem;
+  opacity: 0.4;
+}
+
+.active {
+  opacity: 1;
+}

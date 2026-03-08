@@ -1,0 +1,47 @@
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.thriller {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.scifi {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.action {
+  background: var(--accent4-bg);
+  color: var(--accent4);
+}
+
+.documentary {
+  background: var(--accent2-bg);
+  color: var(--accent2);
+}
+
+.tv {
+  background: var(--accent3-bg);
+  color: var(--accent3);
+}
+
+.pending {
+  background: var(--pending-bg);
+  color: var(--pending);
+}
+
+.notes {
+  background: var(--pending-bg);
+  color: var(--pending);
+  font-size: 0.68rem;
+  font-style: italic;
+  border-radius: 4px;
+  padding: 0.1rem 0.45rem;
+}

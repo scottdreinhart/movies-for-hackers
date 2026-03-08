@@ -1,0 +1,111 @@
+.container {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  touch-action: pan-y;
+}
+
+.container:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.stickyHead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--surface);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  table-layout: fixed;
+}
+
+.watchedHeader {
+  width: 2.5rem;
+}
+
+/* Column widths (col 1 = checkbox, cols 2-9 = data) */
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  width: 19%;
+}
+
+.table th:nth-child(3),
+.table td:nth-child(3) {
+  width: 9%;
+}
+
+.table th:nth-child(4),
+.table td:nth-child(4) {
+  width: 11%;
+}
+
+.table th:nth-child(5),
+.table td:nth-child(5) {
+  width: 8%;
+}
+
+.table th:nth-child(6),
+.table td:nth-child(6) {
+  width: 5%;
+}
+
+.table th:nth-child(7),
+.table td:nth-child(7) {
+  width: 5%;
+}
+
+.table th:nth-child(8),
+.table td:nth-child(8) {
+  width: 6%;
+}
+
+.table th:nth-child(9),
+.table td:nth-child(9) {
+  width: 34%;
+}
+
+@media (max-width: 900px) {
+  .table {
+    font-size: 0.8rem;
+  }
+
+  /* Hide Section, Format, and Rated columns on medium screens */
+  .table th:nth-child(3),
+  .table td:nth-child(3),
+  .table th:nth-child(5),
+  .table td:nth-child(5),
+  .table th:nth-child(7),
+  .table td:nth-child(7) {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Hide Genre and Description on small screens */
+  .table th:nth-child(4),
+  .table td:nth-child(4),
+  .table th:nth-child(9),
+  .table td:nth-child(9) {
+    display: none;
+  }
+}

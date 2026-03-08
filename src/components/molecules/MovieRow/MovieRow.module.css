@@ -1,0 +1,99 @@
+.row {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 42px;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+@media (hover: hover) {
+  .row:hover {
+    background: var(--accent-bg-faint);
+  }
+}
+
+.watched {
+  opacity: 0.55;
+}
+
+.focused {
+  background: var(--accent-bg-subtle);
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.row td {
+  padding: 0.6rem 0.85rem;
+  vertical-align: top;
+}
+
+.checkCell {
+  text-align: center;
+  vertical-align: middle;
+  width: 2rem;
+}
+
+.checkbox {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  accent-color: var(--accent2);
+}
+
+.titleCell a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s;
+}
+
+.titleCell a:hover {
+  color: #79c0ff;
+  text-decoration: underline;
+}
+
+.sectionCell {
+  white-space: nowrap;
+}
+
+.genreCell {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+
+.formatCell {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.yearCell {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.ratedCell {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.ratingCell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.descCell {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.descCell > span {
+  margin-left: 0.5rem;
+}

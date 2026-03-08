@@ -1,0 +1,17 @@
+{
+  "appId": "com.scottdreinhart.moviesforhackers",
+  "appName": "Movies for Hackers",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "StatusBar": {
+      "style": "Dark",
+      "backgroundColor": "#0d1117"
+    },
+    "Keyboard": {
+      "resize": "body"
+    }
+  }
+}

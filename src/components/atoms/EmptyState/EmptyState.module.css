@@ -1,0 +1,10 @@
+.container {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-dim);
+}
+
+.icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}

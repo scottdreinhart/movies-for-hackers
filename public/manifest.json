@@ -1,0 +1,19 @@
+{
+  "name": "Movies for Hackers",
+  "short_name": "Movies4Hackers",
+  "description": "A curated list of 401 movies every hacker & cyberpunk fan must watch.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "orientation": "any",
+  "categories": ["entertainment"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

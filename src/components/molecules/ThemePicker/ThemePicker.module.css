@@ -1,0 +1,82 @@
+.picker {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Segmented control for mode selection */
+.segment {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.segBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.3rem 0.5rem;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.segBtn:not(:last-child) {
+  border-right: 1px solid var(--border);
+}
+
+.segBtn:hover {
+  background: var(--accent-bg-subtle);
+  color: var(--text);
+}
+
+.segBtn.active {
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.modeIcon {
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.modeLabel {
+  line-height: 1;
+}
+
+/* Palette dropdown */
+.paletteSelect {
+  padding: 0.3rem 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.paletteSelect:hover {
+  border-color: var(--accent);
+}
+
+.paletteSelect:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  .modeLabel {
+    display: none;
+  }
+
+  .segBtn {
+    padding: 0.3rem 0.4rem;
+  }
+}
