@@ -91,14 +91,25 @@ The app runs anywhere with a modern browser. Native distribution uses Electron (
 
 ### Install & Run
 
+**Windows (PowerShell):**
+
+```powershell
+git clone https://github.com/scottdreinhart/movies-for-hackers.git
+cd movies-for-hackers
+pnpm dev:win
+```
+
+**Linux / WSL (Ubuntu):**
+
 ```bash
 git clone https://github.com/scottdreinhart/movies-for-hackers.git
 cd movies-for-hackers
-pnpm install
-pnpm dev
+pnpm dev:linux
 ```
 
 Open http://localhost:5175 in your browser.
+
+> **Cross-platform note:** This project uses platform-specific native binaries (Rollup, esbuild, etc.). Always use the `:win` scripts from PowerShell and `:linux` scripts from WSL/Ubuntu. Each command does a clean `pnpm install` for the correct platform (~6s via pnpm's cached store).
 
 ---
 
@@ -106,13 +117,24 @@ Open http://localhost:5175 in your browser.
 
 All scripts are run via `pnpm <script>`.
 
+### Cross-Platform Setup
+
+| Script        | Terminal   | Description                                         |
+| ------------- | ---------- | --------------------------------------------------- |
+| `setup:win`   | PowerShell | Clean install Windows-native `node_modules`         |
+| `setup:linux` | WSL/Ubuntu | Clean install Linux-native `node_modules` (ext4+tar)|
+
 ### Development
 
-| Script    | Description                      |
-| --------- | -------------------------------- |
-| `dev`     | Start Vite dev server with HMR   |
-| `build`   | Production build to `dist/`      |
-| `preview` | Preview production build locally |
+| Script       | Terminal   | Description                               |
+| ------------ | ---------- | ----------------------------------------- |
+| `dev`        | Any        | Start Vite dev server with HMR            |
+| `dev:win`    | PowerShell | Setup Windows modules + start dev server  |
+| `dev:linux`  | WSL/Ubuntu | Setup Linux modules + start dev server    |
+| `build`      | Any        | Production build to `dist/`               |
+| `build:win`  | PowerShell | Setup Windows modules + production build  |
+| `build:linux`| WSL/Ubuntu | Setup Linux modules + production build    |
+| `preview`    | Any        | Preview production build locally          |
 
 ### Code Quality
 
@@ -137,14 +159,15 @@ All scripts are run via `pnpm <script>`.
 
 ### Electron (Desktop)
 
-| Script                 | Description                               |
-| ---------------------- | ----------------------------------------- |
-| `electron:dev`         | Start Vite + open Electron window         |
-| `electron:build`       | Build for current platform                |
-| `electron:build:win`   | Build Windows installer (NSIS + portable) |
-| `electron:build:linux` | Build Linux packages (AppImage + .deb)    |
-| `electron:build:mac`   | Build macOS installer (DMG)               |
-| `electron:build:all`   | Build for all platforms                   |
+| Script                 | Terminal   | Description                               |
+| ---------------------- | ---------- | ----------------------------------------- |
+| `electron:dev`         | Any        | Start Vite + open Electron window         |
+| `electron:dev:win`     | PowerShell | Setup Windows modules + Electron dev      |
+| `electron:build`       | Any        | Build for current platform                |
+| `electron:build:win`   | PowerShell | Setup + build Windows installer (NSIS)    |
+| `electron:build:linux` | WSL/Ubuntu | Setup + build Linux packages (AppImage)   |
+| `electron:build:mac`   | macOS      | Build macOS installer (DMG)               |
+| `electron:build:all`   | Any        | Build for all platforms                   |
 
 Output goes to `release/`.
 
@@ -170,7 +193,7 @@ Output goes to `release/`.
 | `release:desktop` | Validate + build Electron installer |
 | `release:mobile`  | Validate + sync Capacitor           |
 
-> **Electron platform note:** `pnpm install` installs platform-native Electron binaries. If switching between PowerShell (Windows) and WSL (Linux), run `pnpm reinstall` to get the correct binaries.
+> **Cross-platform note:** The `:win` and `:linux` suffixed scripts automatically clean and reinstall `node_modules` with the correct platform-native binaries. Always run `:win` scripts from PowerShell and `:linux` scripts from WSL/Ubuntu.
 
 ---
 
@@ -188,6 +211,10 @@ movies-for-hackers/
 ├── .prettierrc                 # Prettier config
 ├── .nvmrc                      # Node version (22)
 ├── .editorconfig               # Editor formatting rules
+│
+├── scripts/
+│   ├── platform-swap.ps1       # Windows: clean install via pnpm (PowerShell)
+│   └── platform-swap.sh        # Linux: clean install on ext4 + tar copy (WSL)
 │
 ├── public/
 │   ├── manifest.json           # PWA web app manifest
