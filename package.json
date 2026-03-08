@@ -7,8 +7,17 @@
   "packageManager": "pnpm@10.30.3",
   "main": "electron/main.cjs",
   "scripts": {
+    "setup:win": "powershell -ExecutionPolicy Bypass -File scripts/platform-swap.ps1",
+    "setup:linux": "bash scripts/platform-swap.sh",
+
     "dev": "vite",
+    "dev:win": "pnpm setup:win && vite",
+    "dev:linux": "pnpm setup:linux && vite",
+
     "build": "tsc --noEmit && vite build",
+    "build:win": "pnpm setup:win && pnpm build",
+    "build:linux": "pnpm setup:linux && pnpm build",
+
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/",
@@ -22,12 +31,15 @@
     "clean:modules": "rimraf node_modules",
     "reinstall": "pnpm clean:modules && pnpm install",
     "prebuild": "pnpm lint",
+
     "electron:dev": "concurrently -k \"vite\" \"wait-on http://localhost:5175 && electron .\"",
+    "electron:dev:win": "pnpm setup:win && pnpm electron:dev",
     "electron:build": "pnpm build && electron-builder",
-    "electron:build:win": "pnpm build && electron-builder --win",
-    "electron:build:linux": "pnpm build && electron-builder --linux",
+    "electron:build:win": "pnpm setup:win && pnpm build && electron-builder --win",
+    "electron:build:linux": "pnpm setup:linux && pnpm build && electron-builder --linux",
     "electron:build:mac": "pnpm build && electron-builder --mac",
     "electron:build:all": "pnpm build && electron-builder --win --linux --mac",
+
     "cap:sync": "pnpm build && npx cap sync",
     "cap:init:android": "npx cap add android",
     "cap:init:ios": "npx cap add ios",
