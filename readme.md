@@ -595,6 +595,451 @@ block-beta
 | **≤ 900 px** | ☐ Title Genre Year Rating Description | Section, Format, Rated | Header padding → 1 rem; table font → 0.8 rem |
 | **≤ 600 px** | ☐ Title Year Rating | Section, Format, Rated, Genre, Description | Theme picker: icons only (labels hidden); controls wrap |
 
+##### Mobile Layout (≤ 600 px)
+
+```mermaid
+block-beta
+    columns 1
+
+    block:MHEAD["Header (compact)"]
+        columns 2
+        MTITLE["🎬 Movies for Hackers"]
+        MTHEME["💻 🌙 ☀️ ▾"]
+    end
+
+    block:MCTRL1
+        columns 3
+        MSEARCH["⌕ Search…"]
+        MF1["▾ Genre"]
+        MF2["▾ Format"]
+    end
+
+    block:MCTRL2
+        columns 4
+        MF3["▾ MPAA"]
+        MYR["Year ▾–▾"]
+        MRT["IMDb ▾–▾"]
+        MRST["Reset"]
+    end
+
+    block:MTABS["Section Tabs (wrapping)"]
+        columns 4
+        MA["All"]
+        MB["Thrillers"]
+        MC["Sci-Fi"]
+        MD["Action"]
+    end
+
+    block:MTABLE["MovieTable — 4 visible columns"]
+        columns 4
+        MC1["☐"]
+        MC2["Title"]
+        MC3["Year"]
+        MC4["Rating"]
+    end
+```
+
+#### System Context
+
+```mermaid
+C4Context
+    title System Context — Movies for Hackers
+
+    Person(user, "User", "Browses, filters, and tracks hacker movies")
+
+    System(app, "Movies for Hackers", "SPA — React + TypeScript + Vite")
+
+    System_Ext(imdb, "IMDb", "Movie detail pages (external links)")
+    System_Ext(localStorage, "localStorage", "Persists watched list, theme, settings")
+    System_Ext(swCache, "Service Worker / Cache API", "Offline-first asset caching")
+    System_Ext(vibrate, "navigator.vibrate", "Haptic feedback on mobile")
+    System_Ext(matchMedia, "matchMedia", "System color-scheme detection")
+
+    Rel(user, app, "Uses", "Browser / Electron / Capacitor")
+    Rel(app, imdb, "Opens links", "HTTPS")
+    Rel(app, localStorage, "Reads / writes", "Web Storage API")
+    Rel(app, swCache, "Registers & caches", "Service Worker API")
+    Rel(app, vibrate, "Triggers feedback", "Vibration API")
+    Rel(app, matchMedia, "Detects theme", "Media Query API")
+```
+
+#### Build & Deploy Targets
+
+```mermaid
+flowchart LR
+    SRC["Source\nTypeScript + React"] --> VITE["Vite Build\ntsc --noEmit\nvite build"]
+
+    VITE --> DIST["dist/\nStatic SPA"]
+
+    DIST --> PWA["🌐 PWA\nService Worker\nmanifest.json\nOffline-capable"]
+    DIST --> ELECTRON["🖥️ Electron\nWin — NSIS + portable\nLinux — AppImage + deb\nMac — dmg"]
+    DIST --> CAP["📱 Capacitor\nAndroid — APK\niOS — IPA"]
+
+    subgraph chunks["Vendor Chunks"]
+        direction TB
+        VR["vendor-react\nreact + react-dom"]
+        VV["vendor-virtual\n@tanstack/react-virtual"]
+    end
+
+    VITE --> chunks
+
+    style PWA fill:#e8f5e9,stroke:#2e7d32
+    style ELECTRON fill:#e3f2fd,stroke:#1565c0
+    style CAP fill:#fff3e0,stroke:#e65100
+```
+
+#### Data Model
+
+```mermaid
+erDiagram
+    MovieEntry {
+        string title
+        string url
+        string genre
+        string format
+        number year
+        string rated
+        number rating
+        string description
+        string notes
+        string section
+    }
+
+    FilterState {
+        string search
+        string genre
+        string format
+        string rated
+        string section
+        string yearMin
+        string yearMax
+        string ratingMin
+        string ratingMax
+    }
+
+    SortState {
+        string column
+        string direction
+    }
+
+    ThemePreference {
+        string mode
+        string palette
+    }
+
+    WatchedSet {
+        string url PK
+    }
+
+    FeatureFlags {
+        boolean fuzzySearch
+        boolean ratingFirstSort
+        boolean eventLog
+        boolean contractAssertions
+        boolean haptics
+        boolean serviceWorker
+        boolean keyboardHints
+        boolean watchedTracking
+        boolean dpadNavigation
+        boolean liveAnnouncements
+    }
+
+    MovieRowViewModel {
+        string url
+        string title
+        string sectionShort
+        string sectionVariant
+        string ratingFormatted
+        string ratingTier
+        string ratingColor
+        number ratingPercent
+        boolean hasNotes
+    }
+
+    MovieEntry ||--o{ MovieRowViewModel : "selector maps"
+    FilterState ||--o{ MovieEntry : "filters"
+    SortState ||--o{ MovieEntry : "sorts"
+    WatchedSet }o--o{ MovieEntry : "tracks via url"
+    FeatureFlags ||--|| ThemePreference : "stored alongside"
+```
+
+#### Port & Adapter Wiring
+
+```mermaid
+flowchart LR
+    subgraph DOMAIN["Domain (Ports)"]
+        direction TB
+        SP["StoragePort\nget · set · remove · keys"]
+        HP["HapticsPort\ntrigger(intensity)"]
+        MQP["MediaQueryPort\nprefersLightMode · onChange"]
+        SWP["ServiceWorkerPort\nregister(path)"]
+        TP["ThemePort\napply(mode, palette)"]
+    end
+
+    subgraph APP["App (Adapters)"]
+        direction TB
+        LSA["LocalStorage\nAdapter"]
+        BHA["Browser Haptics\nAdapter"]
+        BMQA["Browser MediaQuery\nAdapter"]
+        BSWA["Browser SW\nAdapter"]
+        BTA["Browser Theme\nAdapter"]
+    end
+
+    subgraph NOOP["Null Objects"]
+        direction TB
+        NS["noopStorage"]
+        NH["noopHaptics"]
+        NMQ["noopMediaQuery"]
+        NSW["noopServiceWorker"]
+        NT["noopTheme"]
+    end
+
+    subgraph API["Browser APIs"]
+        direction TB
+        LS["localStorage"]
+        NV["navigator.vibrate"]
+        MM["matchMedia"]
+        NSW2["navigator.serviceWorker"]
+        DOC["document.documentElement"]
+    end
+
+    SP --- LSA
+    HP --- BHA
+    MQP --- BMQA
+    SWP --- BSWA
+    TP --- BTA
+
+    SP -.- NS
+    HP -.- NH
+    MQP -.- NMQ
+    SWP -.- NSW
+    TP -.- NT
+
+    LSA --> LS
+    BHA --> NV
+    BMQA --> MM
+    BSWA --> NSW2
+    BTA --> DOC
+
+    style DOMAIN fill:#e8f5e9,stroke:#2e7d32
+    style APP fill:#e3f2fd,stroke:#1565c0
+    style NOOP fill:#f3e5f5,stroke:#7b1fa2
+    style API fill:#fff3e0,stroke:#e65100
+```
+
+#### Event Flow
+
+```mermaid
+flowchart TD
+    subgraph triggers["User Actions"]
+        T1["Load data"]
+        T2["Change filter"]
+        T3["Reset filters"]
+        T4["Sort column"]
+        T5["Toggle watched"]
+        T6["Change theme"]
+        T7["Select section"]
+        T8["Open movie"]
+    end
+
+    subgraph events["Domain Events"]
+        E1["DataLoaded\ncount · timestamp"]
+        E2["DataLoadFailed\nerror · timestamp"]
+        E3["FilterChanged\nkey · value · resultCount"]
+        E4["FiltersReset\nresultCount"]
+        E5["SortChanged\ncolumn · direction"]
+        E6["WatchedToggled\nurl · isWatched"]
+        E7["ThemeModeChanged\nmode"]
+        E8["ThemePaletteChanged\npalette"]
+        E9["SectionSelected\nsection"]
+        E10["MovieOpened\nurl · title"]
+    end
+
+    subgraph bus["EventBus"]
+        EB["emit(event)\non(type | *, listener)\nclear()"]
+    end
+
+    subgraph log["EventLogger"]
+        EL["Ring buffer (max 1000)\nsnapshot · ofType · last"]
+    end
+
+    T1 -->|success| E1
+    T1 -->|failure| E2
+    T2 --> E3
+    T3 --> E4
+    T4 --> E5
+    T5 --> E6
+    T6 --> E7 & E8
+    T7 --> E9
+    T8 --> E10
+
+    E1 & E2 & E3 & E4 & E5 & E6 & E7 & E8 & E9 & E10 --> EB
+    EB -->|"wildcard *"| EL
+```
+
+#### User Journey
+
+```mermaid
+journey
+    title Typical User Session
+    section Discovery
+        Open app: 5: User
+        Wait for data to load: 3: App
+        Browse movie list: 4: User
+    section Filtering
+        Search by title: 5: User
+        Filter by genre: 4: User
+        Filter by section tab: 4: User
+        Adjust year range: 3: User
+        Reset all filters: 5: User
+    section Exploration
+        Sort by rating: 4: User
+        Sort by year: 4: User
+        Read descriptions: 3: User
+        Open movie on IMDb: 5: User
+    section Tracking
+        Mark movie as watched: 5: User
+        Switch section tabs: 4: User
+        Review watched movies: 4: User
+    section Customisation
+        Switch to dark mode: 5: User
+        Change colour palette: 4: User
+```
+
+#### Sequence — Data Loading
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant HP as HomePage
+    participant UMD as useMovieData
+    participant VP as Vite Plugin
+    participant EB as EventBus
+
+    U->>HP: Opens app
+    HP->>UMD: mount → fetch data
+    UMD->>VP: import virtual:movie-data
+    VP-->>UMD: raw markdown string
+
+    alt Parse succeeds
+        UMD->>UMD: parseMarkdownTable()
+        UMD-->>HP: entries[], loading=false
+        HP->>EB: emit DataLoaded(count)
+    else Parse fails
+        UMD-->>HP: error, loading=false
+        HP->>EB: emit DataLoadFailed(error)
+    end
+```
+
+#### Sequence — Filter & Sort
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant HP as HomePage
+    participant UF as useFilters
+    participant US as useSort
+    participant FP as filterPolicy
+    participant SS as sortStrategy
+    participant EB as EventBus
+    participant LA as useLiveAnnouncer
+
+    U->>HP: Types in search / selects dropdown
+    HP->>UF: setFilter(key, value)
+    UF->>FP: apply filter chain
+    FP-->>UF: filteredEntries[]
+    UF-->>HP: filtered result
+
+    HP->>EB: emit FilterChanged(key, value, count)
+
+    HP->>US: sortedEntries(filtered)
+    US->>SS: applySortStrategy(entries, col, dir)
+    SS-->>US: sorted[]
+    US-->>HP: final sorted entries
+
+    HP->>LA: announce("Showing X of Y movies")
+    LA-->>U: aria-live region update (500 ms delay)
+```
+
+#### Sequence — Theme Change
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant TP as ThemePicker
+    participant HP as HomePage
+    participant UT as useTheme
+    participant REPO as ThemeRepository
+    participant PORT as ThemePort
+    participant EB as EventBus
+
+    U->>TP: Click mode button / select palette
+    TP->>HP: onChange(mode | palette)
+    HP->>UT: setMode / setPalette
+    UT->>REPO: save preference (localStorage)
+    UT->>PORT: apply(resolvedMode, palette)
+    PORT->>PORT: set data-theme-mode &<br/>data-theme-palette on <html>
+    HP->>EB: emit ThemeModeChanged / ThemePaletteChanged
+```
+
+#### Module Dependency Graph
+
+```mermaid
+flowchart BT
+    subgraph domain["domain/ — pure, no imports from app/ or UI"]
+        types_d["types/\nappPhase · commands\nevents · brandedTypes"]
+        ports["ports/\nStorage · Haptics · MediaQuery\nServiceWorker · Theme"]
+        policies["policies/\nfilter · rating\ndebounce · vScroll"]
+        selectors["selectors/\nmovieSelectors"]
+        strategies["strategies/\nsearch · sort"]
+        events_d["events/\neventBus"]
+        contracts["contracts/\nassertions"]
+        state["state/\nappStateMachine"]
+        flags["featureFlags/\nflags"]
+    end
+
+    subgraph app["app/ — imports domain/ only"]
+        adapters["adapters/\nlocalStorage · haptics\nmediaQuery · SW · theme"]
+        nullObjects["nullObjects/\nnoop implementations"]
+        repos["repositories/\nwatched · theme · settings"]
+        commands_a["commands/\ndispatcher"]
+        eventLog["eventLog/\nlogger (ring buffer)"]
+        compRoot["compositionRoot"]
+    end
+
+    subgraph ui["UI — imports hooks/, domain/, app/"]
+        providers["providers/\nAppProvider"]
+        pages["pages/\nHomePage"]
+        organisms["organisms/\nHeader · MovieTable\nSectionTabs · ErrorBoundary"]
+        molecules["molecules/\nMovieRow · TableHeaderCell\nThemePicker"]
+        atoms["atoms/\nBadge · Button · EmptyState\nRatingBar · SearchInput\nSectionTab · SelectDropdown\nSortArrow · Spinner"]
+    end
+
+    subgraph hooks_g["hooks/ — thin wrappers"]
+        hooks["useMovieData · useFilters\nuseSort · useWatched\nuseTheme · useDebouncedInput\nuseLiveAnnouncer · useKeyboardShortcut\nuseDpadNavigation · useHapticCallback\nuseFilterCallbacks"]
+    end
+
+    adapters -->|implements| ports
+    nullObjects -.->|implements| ports
+    repos --> ports
+    commands_a --> types_d & events_d
+    eventLog --> types_d & events_d
+    compRoot --> ports & events_d & flags & adapters & repos & commands_a & eventLog & nullObjects
+
+    hooks --> policies & selectors & strategies & types_d
+    providers --> compRoot & flags
+
+    pages --> hooks_g & providers & selectors
+    organisms --> molecules & atoms
+    molecules --> atoms
+    pages --> organisms
+
+    style domain fill:#e8f5e9,stroke:#2e7d32
+    style app fill:#e3f2fd,stroke:#1565c0
+    style ui fill:#fce4ec,stroke:#c62828
+    style hooks_g fill:#fff3e0,stroke:#e65100
+```
+
 ---
 
 ## Movie List Sections
