@@ -4,13 +4,28 @@ import type { ThemeMode, ThemePalette, ResolvedMode, ThemePreference } from '../
 
 const DEFAULT_THEME: ThemePreference = { mode: 'system', palette: 'default' };
 
-/** Resolve the effective mode from a user preference. */
+/**
+ * Resolve the effective mode from a user preference.
+ *
+ * Pure function — part of the functional core.
+ * The browser media-query call is the only impure part;
+ * production code should use the MediaQueryPort adapter.
+ *
+ * @pattern Functional Core, Imperative Shell
+ */
 function resolveMode(mode: ThemeMode): ResolvedMode {
   if (mode === 'dark' || mode === 'light') return mode;
   return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 }
 
-/** Apply the theme to the document root element as data attributes. */
+/**
+ * Apply the theme to the document root element as data attributes.
+ *
+ * Imperative shell — DOM mutation isolated in one place.
+ * Production code should use the ThemePort adapter.
+ *
+ * @pattern Adapter Pattern (ThemePort)
+ */
 function applyTheme(mode: ThemeMode, palette: ThemePalette): void {
   const resolved = resolveMode(mode);
   document.documentElement.setAttribute('data-theme-mode', resolved);
@@ -27,6 +42,13 @@ interface UseThemeResult {
 
 /**
  * Hook to manage theme mode and color palette.
+ *
+ * Persistence uses the legacy storageService for backward compatibility.
+ * The `ThemeRepository` port provides a cleaner abstraction for new code.
+ *
+ * @pattern Repository Pattern (via storageService)
+ * @pattern Command Pattern (setMode / setPalette)
+ * @pattern Adapter Pattern (resolveMode / applyTheme)
  */
 export function useTheme(): UseThemeResult {
   const [theme, setTheme] = useState<ThemePreference>(() => {
@@ -36,12 +58,12 @@ export function useTheme(): UseThemeResult {
 
   const resolvedMode = resolveMode(theme.mode);
 
-  // Apply theme to DOM on every change
+  // Imperative shell: apply theme to DOM on every change
   useEffect(() => {
     applyTheme(theme.mode, theme.palette);
   }, [theme.mode, theme.palette]);
 
-  // Listen for OS color-scheme changes when in 'system' mode
+  // Imperative shell: listen for OS color-scheme changes when in 'system' mode
   useEffect(() => {
     if (theme.mode !== 'system') return;
 

@@ -4,13 +4,17 @@ import { EmptyState } from '../../atoms';
 import { TableHeaderCell, MovieRow } from '../../molecules';
 import { TABLE_COLUMNS } from '../../../constants/sectionMeta';
 import { useDpadNavigation } from '../../../hooks/useDpadNavigation';
+import { ROW_HEIGHT_PX, OVERSCAN_ROWS } from '../../../domain/policies/virtualScrollPolicy';
 import type { MovieEntry, SortDirection } from '../../../types';
 import styles from './MovieTable.module.css';
 
-/** Estimated height (px) of a single row — used by the virtualizer. */
-const ROW_HEIGHT = 42;
-/** Extra rows rendered above/below the visible window for smooth scrolling. */
-const OVERSCAN = 10;
+/**
+ * Virtual-scroll constants sourced from the domain policy layer.
+ *
+ * @pattern Policy Object — scroll tuning lives in virtualScrollPolicy
+ */
+const ROW_HEIGHT = ROW_HEIGHT_PX;
+const OVERSCAN = OVERSCAN_ROWS;
 
 interface MovieTableProps {
   entries: MovieEntry[];

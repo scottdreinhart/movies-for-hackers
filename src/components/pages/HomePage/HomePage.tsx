@@ -2,18 +2,29 @@ import { useCallback, useMemo } from 'react';
 import { Spinner, EmptyState } from '../../atoms';
 import { Header, SectionTabs, MovieTable } from '../../organisms';
 import MainLayout from '../../templates/MainLayout/MainLayout';
+import { useAppContainer } from '../../providers';
 import { useMovieData } from '../../../hooks/useMovieData';
 import { useFilters } from '../../../hooks/useFilters';
 import { useSort } from '../../../hooks/useSort';
 import { useWatched } from '../../../hooks/useWatched';
 import { useTheme } from '../../../hooks/useTheme';
 import { useLiveAnnouncer } from '../../../hooks/useLiveAnnouncer';
+import { selectAnnouncementMessage } from '../../../domain/selectors';
+import { DomainEvents } from '../../../domain/types/events';
 
 /**
  * Page: wires data hooks to organisms via the MainLayout template.
- * This is the composition root — all data flows from hooks through props.
+ *
+ * Consumes the composition root via `useAppContainer()` and distributes
+ * services / ports to child hooks.  Emits domain events through the
+ * event bus so side-effect subscribers stay decoupled.
+ *
+ * @pattern Composition Root (UI wiring point)
+ * @pattern Tell, Don't Ask
+ * @pattern CQRS-lite (selectors for derived view data)
  */
 export default function HomePage() {
+  const { eventBus } = useAppContainer();
   const { entries, loading, error } = useMovieData();
   const {
     filters,
@@ -29,21 +40,28 @@ export default function HomePage() {
   const { watched, toggleWatched } = useWatched();
   const { mode, palette, setMode, setPalette } = useTheme();
 
-  const announcement = useMemo(() => {
-    if (loading) return 'Loading movie data';
-    return `Showing ${sortedEntries.length} of ${entries.length} movies`;
-  }, [loading, sortedEntries.length, entries.length]);
+  // Selector: derive the announcement message (CQRS-lite read model)
+  const announcement = useMemo(
+    () => selectAnnouncementMessage(loading, sortedEntries.length, entries.length),
+    [loading, sortedEntries.length, entries.length],
+  );
 
   const liveMessage = useLiveAnnouncer(announcement);
 
+  // Command: reset all filters + sort (Tell, Don't Ask)
   const handleReset = useCallback(() => {
     resetFilters();
     resetSort();
-  }, [resetFilters, resetSort]);
+    eventBus.emit(DomainEvents.filtersReset(entries.length));
+  }, [resetFilters, resetSort, eventBus, entries.length]);
 
+  // Command: select section (emits domain event)
   const handleSectionSelect = useCallback(
-    (section: string) => updateFilter('section', section),
-    [updateFilter],
+    (section: string) => {
+      updateFilter('section', section);
+      eventBus.emit(DomainEvents.sectionSelected(section));
+    },
+    [updateFilter, eventBus],
   );
 
   let content;

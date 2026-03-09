@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
-import { compareEntries } from '../utils/sortUtils';
+import { defaultSortStrategy, applySortStrategy } from '../domain/strategies/sortStrategy';
+import { DEFAULT_SORT_STATE } from '../domain/types/commands';
 import type { MovieEntry, SortDirection } from '../types';
 
 interface UseSortResult {
@@ -12,10 +13,16 @@ interface UseSortResult {
 
 /**
  * Hook to manage sort state and produce a sorted copy of entries.
+ *
+ * Uses the Strategy Pattern for sort algorithms — the default is
+ * `naturalSortStrategy` with article-stripping for titles.
+ *
+ * @pattern Strategy Pattern (sort algorithm)
+ * @pattern Command Pattern (toggleSort / resetSort)
  */
 export function useSort(entries: MovieEntry[]): UseSortResult {
-  const [sortCol, setSortCol] = useState('title');
-  const [sortDir, setSortDir] = useState<SortDirection>('asc');
+  const [sortCol, setSortCol] = useState(DEFAULT_SORT_STATE.column);
+  const [sortDir, setSortDir] = useState<SortDirection>(DEFAULT_SORT_STATE.direction);
 
   const toggleSort = useCallback(
     (col: string) => {
@@ -30,12 +37,12 @@ export function useSort(entries: MovieEntry[]): UseSortResult {
   );
 
   const resetSort = useCallback(() => {
-    setSortCol('title');
-    setSortDir('asc');
+    setSortCol(DEFAULT_SORT_STATE.column);
+    setSortDir(DEFAULT_SORT_STATE.direction);
   }, []);
 
   const sortedEntries = useMemo(
-    () => [...entries].sort((a, b) => compareEntries(a, b, sortCol as keyof MovieEntry, sortDir)),
+    () => applySortStrategy(entries, defaultSortStrategy, sortCol as keyof MovieEntry, sortDir),
     [entries, sortCol, sortDir],
   );
 

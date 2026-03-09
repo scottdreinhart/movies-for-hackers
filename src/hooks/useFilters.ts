@@ -1,18 +1,19 @@
 import { useState, useMemo, useCallback } from 'react';
 import { matchesSearch } from '../utils/searchUtils';
+import {
+  INITIAL_FILTERS,
+  parseYearFilter,
+  parseRatingFilter,
+  YEAR_RANGE,
+  RATING_RANGE,
+} from '../domain/policies/filterPolicy';
+import {
+  selectGenres,
+  selectYears,
+  selectRatings,
+  selectSectionCounts,
+} from '../domain/selectors/movieSelectors';
 import type { MovieEntry, FilterState, SectionCounts } from '../types';
-
-const INITIAL_FILTERS: FilterState = {
-  search: '',
-  genre: '',
-  format: '',
-  rated: '',
-  section: '',
-  yearMin: '',
-  yearMax: '',
-  ratingMin: '',
-  ratingMax: '',
-};
 
 interface UseFiltersResult {
   filters: FilterState;
@@ -27,6 +28,13 @@ interface UseFiltersResult {
 
 /**
  * Hook to manage filter state and derive filtered entries + metadata.
+ *
+ * Filter defaults come from the filter policy (Policy Objects pattern).
+ * Aggregate metadata is derived via selectors (CQRS-lite).
+ *
+ * @pattern Policy Objects (filter defaults)
+ * @pattern CQRS-lite / Selector Pattern (derived metadata)
+ * @pattern Functional Core (pure filter logic)
  */
 export function useFilters(entries: MovieEntry[]): UseFiltersResult {
   const [filters, setFilters] = useState(INITIAL_FILTERS);
@@ -42,10 +50,10 @@ export function useFilters(entries: MovieEntry[]): UseFiltersResult {
   const filteredEntries = useMemo(() => {
     const { search, genre, format, rated, section, yearMin, yearMax, ratingMin, ratingMax } =
       filters;
-    const yMin = parseInt(yearMin, 10) || 0;
-    const yMax = parseInt(yearMax, 10) || 9999;
-    const rMin = parseFloat(ratingMin) || 0;
-    const rMax = parseFloat(ratingMax) || 10;
+    const yMin = parseYearFilter(yearMin, YEAR_RANGE.min);
+    const yMax = parseYearFilter(yearMax, YEAR_RANGE.max);
+    const rMin = parseRatingFilter(ratingMin, RATING_RANGE.min);
+    const rMax = parseRatingFilter(ratingMax, RATING_RANGE.max);
 
     const searchWords: string[] | null = search ? search.toLowerCase().trim().split(/\s+/) : null;
 
@@ -68,30 +76,11 @@ export function useFilters(entries: MovieEntry[]): UseFiltersResult {
     });
   }, [entries, filters]);
 
-  /** All metadata computed in a single pass across all entries. */
-  const { genres, years, ratings, sectionCounts } = useMemo(() => {
-    const genreSet = new Set<string>();
-    const yearSet = new Set<number>();
-    const ratingSet = new Set<number>();
-    const counts: SectionCounts = {};
-
-    for (const e of entries) {
-      e.genre.split('/').forEach((g) => {
-        const trimmed = g.trim();
-        if (trimmed) genreSet.add(trimmed);
-      });
-      yearSet.add(e.year);
-      ratingSet.add(e.rating);
-      counts[e.section] = (counts[e.section] || 0) + 1;
-    }
-
-    return {
-      genres: [...genreSet].sort(),
-      years: [...yearSet].sort((a, b) => a - b),
-      ratings: [...ratingSet].sort((a, b) => a - b),
-      sectionCounts: counts,
-    };
-  }, [entries]);
+  /** Aggregate metadata derived via selectors (single-pass). */
+  const genres = useMemo(() => selectGenres(entries), [entries]);
+  const years = useMemo(() => selectYears(entries), [entries]);
+  const ratings = useMemo(() => selectRatings(entries), [entries]);
+  const sectionCounts = useMemo(() => selectSectionCounts(entries), [entries]);
 
   return {
     filters,

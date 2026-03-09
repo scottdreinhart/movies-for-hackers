@@ -47,7 +47,36 @@ pnpm validate       # Full CI pipeline locally (lint + format + build)
 - React components follow **Atomic Design** (atoms → molecules → organisms → templates → pages)
 - CSS Modules for scoped styling — one `.module.css` per component
 - Custom hooks for state logic — keep components presentation-focused
-- Use barrel exports (`index.js`) at each atomic level
+- Use barrel exports (`index.ts`) at each atomic level
+
+## Architecture Guidelines
+
+The codebase follows a layered architecture with 20 design patterns. See [ARCHITECTURE.md](ARCHITECTURE.md) for the full guide.
+
+### Where to put new code
+
+| What you're adding | Where it goes |
+|--------------------|---------------|
+| New business rule / constant | `src/domain/policies/` |
+| New port interface | `src/domain/ports/` |
+| New browser adapter | `src/app/adapters/` (implement a port) |
+| New null-object fallback | `src/app/nullObjects/` |
+| New persistence abstraction | `src/app/repositories/` |
+| New command type | `src/domain/types/commands.ts` |
+| New domain event | `src/domain/types/events.ts` |
+| New derived / computed data | `src/domain/selectors/` |
+| New algorithm variant | `src/domain/strategies/` |
+| New React hook | `src/hooks/` (bridge domain ↔ UI) |
+| New UI component | `src/components/` (follow Atomic Design level) |
+
+### Key principles
+
+- **Domain layer** (`src/domain/`) must have **zero side-effects** and **zero framework imports**. Pure functions only.
+- **App layer** (`src/app/`) owns all I/O — localStorage, DOM mutation, event subscriptions.
+- **UI layer** (`src/components/`, `src/hooks/`) calls domain functions and delegates side-effects to app adapters.
+- Use **feature flags** (`src/domain/featureFlags/`) to gate new functionality.
+- Prefer **null-object adapters** over `if` checks when a feature is disabled.
+- All timing constants live in **policy objects** (`debouncePolicy`, `virtualScrollPolicy`), not inline.
 
 ## Questions?
 

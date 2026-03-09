@@ -18,7 +18,7 @@
 > © 2026 Scott Reinhart. This software is proprietary and confidential.
 > Unauthorized reproduction, distribution, or use is strictly prohibited. See [LICENSE](LICENSE.md) file for complete terms and conditions.
 
-[Project Structure](#project-structure) · [Getting Started](#getting-started) · [Scripts](#scripts) · [Device Compatibility](#device-compatibility) · [Movie List](#movie-list-sections) · [Tech Stack](#tech-stack) · [Roadmap](#roadmap) · [Contributors](#contributors) · [Contributing](contributing.md)
+[Project Structure](#project-structure) · [Architecture](#architecture) · [Getting Started](#getting-started) · [Scripts](#scripts) · [Device Compatibility](#device-compatibility) · [Movie List](#movie-list-sections) · [Tech Stack](#tech-stack) · [Roadmap](#roadmap) · [Contributors](#contributors) · [Contributing](contributing.md)
 
 </div>
 
@@ -225,20 +225,65 @@ movies-for-hackers/
 ├── electron/
 │   └── main.cjs                # Electron main process (security-hardened)
 │
+├── ARCHITECTURE.md             # Full architecture guide (20 design patterns)
+│
 ├── src/
-│   ├── main.tsx                # React entry point
+│   ├── main.tsx                # React entry point (wrapped in AppProvider)
 │   ├── App.tsx                 # Root component with ErrorBoundary
+│   │
+│   ├── domain/                 # Functional core — pure, framework-agnostic
+│   │   ├── ports/              # Hexagonal port interfaces
+│   │   │   ├── storagePort.ts  # Key-value persistence contract
+│   │   │   ├── hapticsPort.ts  # Haptic feedback contract
+│   │   │   ├── mediaQueryPort.ts # OS media-query contract
+│   │   │   ├── serviceWorkerPort.ts # SW registration contract
+│   │   │   └── themePort.ts    # DOM theme-application contract
+│   │   │
+│   │   ├── types/              # Domain type system
+│   │   │   ├── appPhase.ts     # FSM discriminated union (idle|loading|ready|error)
+│   │   │   ├── commands.ts     # Command pattern — 10 command variants
+│   │   │   ├── events.ts       # Domain events — 10 event variants
+│   │   │   └── brandedTypes.ts # Branded/opaque types (Rating, Year, etc.)
+│   │   │
+│   │   ├── contracts/          # Design by Contract — assertions & guards
+│   │   ├── policies/           # Policy objects — business-rule constants
+│   │   │   ├── filterPolicy.ts # Initial filters, year/rating ranges, parsers
+│   │   │   ├── ratingPolicy.ts # Tier thresholds, colors, formatting
+│   │   │   ├── debouncePolicy.ts # Timing constants (search, announce, haptic)
+│   │   │   └── virtualScrollPolicy.ts # Row height, overscan
+│   │   │
+│   │   ├── state/              # FSM transition function & guards
+│   │   ├── events/             # Event bus (pub/sub with wildcard support)
+│   │   ├── selectors/          # Pure selector / view-model functions
+│   │   ├── strategies/         # Strategy pattern — search & sort algorithms
+│   │   └── featureFlags/       # Feature flag definitions & helpers
+│   │
+│   ├── app/                    # Imperative shell — I/O & wiring
+│   │   ├── adapters/           # Browser adapter implementations
+│   │   │   ├── localStorageAdapter.ts
+│   │   │   ├── browserHapticsAdapter.ts
+│   │   │   ├── browserMediaQueryAdapter.ts
+│   │   │   ├── browserServiceWorkerAdapter.ts
+│   │   │   └── browserThemeAdapter.ts
+│   │   │
+│   │   ├── nullObjects/        # Null-object adapters (no-ops for disabled features)
+│   │   ├── repositories/       # Repository pattern — watched, theme, settings
+│   │   ├── commands/           # Command dispatcher (routes commands → handlers)
+│   │   ├── eventLog/           # Event logger — ring-buffer snapshot & replay
+│   │   └── compositionRoot.ts  # Dependency wiring — single assembly point
 │   │
 │   ├── types/                  # TypeScript type definitions
 │   │   ├── index.ts            # Shared interfaces & type aliases
 │   │   └── declarations.d.ts   # CSS Modules + virtual module declarations
 │   │
 │   ├── components/             # Atomic Design hierarchy
+│   │   ├── providers/          # React context (AppProvider + container hooks)
+│   │   │
 │   │   ├── atoms/              # UI primitives
 │   │   │   ├── Badge/          # Section category badges
 │   │   │   ├── Button/         # Reusable button
 │   │   │   ├── EmptyState/     # No-results / error message
-│   │   │   ├── RatingBar/      # Rating display with color bar
+│   │   │   ├── RatingBar/      # Rating display with color bar (uses ratingPolicy)
 │   │   │   ├── SearchInput/    # Debounced text search (/ shortcut)
 │   │   │   ├── SectionTab/     # Category pill button
 │   │   │   ├── SelectDropdown/ # Generic select element
@@ -253,7 +298,7 @@ movies-for-hackers/
 │   │   ├── organisms/          # Complex UI sections
 │   │   │   ├── ErrorBoundary/  # React error boundary
 │   │   │   ├── Header/         # App header with all filter controls
-│   │   │   ├── MovieTable/     # Virtualized data table
+│   │   │   ├── MovieTable/     # Virtualized data table (uses virtualScrollPolicy)
 │   │   │   └── SectionTabs/    # Tab bar for sections
 │   │   │
 │   │   ├── templates/          # Page layout structure
@@ -266,20 +311,20 @@ movies-for-hackers/
 │   │   ├── sectionMeta.ts      # Section names, colors, column defs, filter options
 │   │   └── themeMeta.ts        # Theme modes, palettes, labels
 │   │
-│   ├── hooks/                  # Custom React hooks
-│   │   ├── useDebouncedInput.ts# Debounced text input with external sync
+│   ├── hooks/                  # Custom React hooks (bridge domain ↔ UI)
+│   │   ├── useDebouncedInput.ts# Debounced text input (uses debouncePolicy)
 │   │   ├── useDpadNavigation.ts# D-pad / arrow-key / remote navigation
 │   │   ├── useFilterCallbacks.ts# Factory hook for per-key filter callbacks
-│   │   ├── useFilters.ts       # Filter state, derived data, single-pass metadata
+│   │   ├── useFilters.ts       # Filter state via filterPolicy + domain selectors
 │   │   ├── useHapticCallback.ts# Wraps callbacks with haptic feedback
 │   │   ├── useKeyboardShortcut.ts# Global keyboard shortcut registration
-│   │   ├── useLiveAnnouncer.ts # Debounced aria-live message for screen readers
+│   │   ├── useLiveAnnouncer.ts # Debounced aria-live (uses debouncePolicy)
 │   │   ├── useMovieData.ts     # Build-time JSON (prod) / fetch+parse (dev)
-│   │   ├── useSort.ts          # Sort state & logic
-│   │   ├── useTheme.ts         # Dark/light/system mode + palette (localStorage)
+│   │   ├── useSort.ts          # Sort state via domain strategies
+│   │   ├── useTheme.ts         # Theme mode + palette (adapter + repository)
 │   │   └── useWatched.ts       # Watched checkbox state (localStorage)
 │   │
-│   ├── services/               # Data processing & platform services
+│   ├── services/               # Legacy services (being migrated to ports)
 │   │   ├── markdownParser.ts   # Markdown → structured data parser (shared by Vite plugin)
 │   │   ├── registerSW.ts       # Service worker registration for PWA
 │   │   └── storageService.ts   # localStorage abstraction for persistence
@@ -289,7 +334,7 @@ movies-for-hackers/
 │   │   ├── global.css          # Reset, base styles, focus-visible
 │   │   └── inputs.module.css   # Shared input base class
 │   │
-│   └── utils/                  # Pure utility functions
+│   └── utils/                  # Legacy utilities (being migrated to policies)
 │       ├── haptics.ts          # Cross-platform haptic feedback (vibrate API)
 │       ├── ratingUtils.ts      # Rating tier/color helpers
 │       ├── searchUtils.ts      # WeakMap haystack cache + search matching
@@ -303,9 +348,19 @@ movies-for-hackers/
 
 ### Architecture
 
-The project follows **Atomic Design** with clear **Separation of Concerns**:
+The project implements **20 architectural design patterns** organized into three layers. See [ARCHITECTURE.md](ARCHITECTURE.md) for the full guide.
 
-| Layer         | Purpose                                   | Example                                                |
+#### Layers
+
+| Layer | Directory | Responsibility |
+| ----- | --------- | -------------- |
+| **Domain** (Functional Core) | `src/domain/` | Pure functions — ports, types, contracts, policies, selectors, strategies, FSM, event bus, feature flags. Zero side-effects, zero framework dependencies. |
+| **App** (Imperative Shell) | `src/app/` | I/O & wiring — browser adapters, null-object adapters, repositories, command dispatcher, event logger, composition root. |
+| **UI** (Presentation) | `src/components/` | React components (Atomic Design), providers (context), hooks (bridge domain ↔ UI). |
+
+#### Atomic Design
+
+| Level         | Purpose                                   | Example                                                |
 | ------------- | ----------------------------------------- | ------------------------------------------------------ |
 | **Atoms**     | Single-responsibility UI primitives       | `Badge`, `Button`, `Spinner`, `SearchInput`            |
 | **Molecules** | Composed atom combinations                | `MovieRow`, `TableHeaderCell`, `ThemePicker`           |
@@ -313,7 +368,132 @@ The project follows **Atomic Design** with clear **Separation of Concerns**:
 | **Templates** | Page layout with content slots            | `MainLayout`                                           |
 | **Pages**     | Data wiring — connects hooks to organisms | `HomePage`                                             |
 
-Data flows unidirectionally: **Hooks → Page → Organisms → Molecules → Atoms**
+#### Key Patterns
+
+| # | Pattern | Primary Location |
+|---|---------|------------------|
+| 1 | Hexagonal / Ports & Adapters | `domain/ports/`, `app/adapters/` |
+| 2 | Functional Core / Imperative Shell | `domain/` vs `app/` |
+| 3 | Finite State Machine | `domain/types/appPhase.ts`, `domain/state/` |
+| 4 | Command Pattern | `domain/types/commands.ts`, `app/commands/` |
+| 5 | CQRS-lite / Selectors | `domain/selectors/` |
+| 6 | Strategy Pattern | `domain/strategies/` |
+| 7 | Discriminated Unions | `domain/types/appPhase.ts`, `commands.ts`, `events.ts` |
+| 8 | Design by Contract | `domain/contracts/`, `domain/types/brandedTypes.ts` |
+| 9 | Tell Don't Ask / Law of Demeter | hooks expose only owned data |
+| 10 | Repository Pattern | `app/repositories/` |
+| 11 | Adapter Pattern | `app/adapters/` |
+| 12 | Composition Root | `app/compositionRoot.ts` |
+| 13 | Presenter / ViewModel | `domain/selectors/movieSelectors.ts` |
+| 14 | Feature Flags | `domain/featureFlags/` |
+| 15 | Null Object Pattern | `app/nullObjects/` |
+| 16 | Policy Objects | `domain/policies/` |
+| 17 | Snapshot + Replay / Event Log | `app/eventLog/` |
+| 18 | Event-Driven Architecture | `domain/events/`, `domain/types/events.ts` |
+| 19 | Selector Pattern | `domain/selectors/` |
+| 20 | Branded / Opaque Types | `domain/types/brandedTypes.ts` |
+
+Data flows unidirectionally: **Domain → App → Hooks → Page → Organisms → Molecules → Atoms**
+
+#### Component Nesting
+
+```
+StrictMode
+└── AppProvider                             (context — creates AppContainer)
+    └── App
+        └── ErrorBoundary                   (organism — catches render errors)
+            └── HomePage                    (page — all hooks live here)
+                └── MainLayout              (template — slots: header, tabs, children)
+                    │
+                    ├── header ─► Header                       (organism)
+                    │               ├── ThemePicker            (molecule)
+                    │               │     └── <button>s, <select>
+                    │               ├── SearchInput             (atom)
+                    │               ├── SelectDropdown × 6      (atom — genre, format, rated, year, rating)
+                    │               └── Button                  (atom — Reset)
+                    │
+                    ├── tabs ──► SectionTabs                    (organism)
+                    │               └── MemoTab × N
+                    │                     └── SectionTab        (atom)
+                    │
+                    └── children (one of)
+                        ├── Spinner                             (atom — loading)
+                        ├── EmptyState                          (atom — error)
+                        └── MovieTable                          (organism — normal)
+                              ├── TableHeaderCell × N           (molecule)
+                              │     └── SortArrow               (atom)
+                              ├── MovieRow × N (virtualized)    (molecule)
+                              │     ├── Badge × 1–2             (atom)
+                              │     └── RatingBar               (atom)
+                              └── EmptyState                    (atom — 0 results)
+```
+
+#### Application Data Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  DOMAIN (pure functions — no side-effects)                                  │
+│                                                                             │
+│  movie_list.md ──parse──► MovieEntry[]                                      │
+│                                                                             │
+│  ┌──────────┐  ┌───────────┐  ┌───────────┐  ┌────────────┐  ┌──────────┐  │
+│  │ policies │  │ selectors │  │strategies │  │  contracts │  │   FSM    │  │
+│  │ filter   │  │ genres    │  │ search    │  │ assertions │  │ idle     │  │
+│  │ rating   │  │ years     │  │ sort      │  │ branded    │  │ loading  │  │
+│  │ debounce │  │ ratings   │  │           │  │ types      │  │ ready    │  │
+│  │ vScroll  │  │ counts    │  │           │  │            │  │ error    │  │
+│  └────┬─────┘  └─────┬─────┘  └─────┬─────┘  └────────────┘  └──────────┘  │
+│       │              │              │                                        │
+│       │    ┌─────────┴──────────────┘                                        │
+│       │    │   ┌──────────┐  ┌──────────────┐                                │
+│       │    │   │ eventBus │  │ featureFlags │                                │
+│       │    │   └────┬─────┘  └──────┬───────┘                                │
+└───────┼────┼────────┼───────────────┼────────────────────────────────────────┘
+        │    │        │               │
+┌───────┼────┼────────┼───────────────┼────────────────────────────────────────┐
+│  APP  │    │        │               │  (imperative shell — I/O & wiring)     │
+│       ▼    ▼        ▼               ▼                                        │
+│  ┌─────────────────────────────────────────┐                                 │
+│  │          compositionRoot                │  ◄── single assembly point      │
+│  │  wires: adapters, repos, dispatcher,    │                                 │
+│  │         eventBus, eventLogger, flags    │                                 │
+│  └────────────────────┬────────────────────┘                                 │
+│       │               │               │                                      │
+│  ┌────▼─────┐  ┌──────▼──────┐  ┌─────▼──────┐                              │
+│  │ adapters │  │repositories │  │  commands   │                              │
+│  │ storage  │  │ watched     │  │ dispatcher  │                              │
+│  │ haptics  │  │ theme       │  └─────────────┘                              │
+│  │ theme    │  │ settings    │                                               │
+│  │ media    │  └─────────────┘  ┌─────────────┐                              │
+│  │ SW       │                   │  eventLog   │                              │
+│  └──────────┘                   │ (ring buf)  │                              │
+│       │                         └─────────────┘                              │
+└───────┼──────────────────────────────────────────────────────────────────────┘
+        │
+┌───────┼──────────────────────────────────────────────────────────────────────┐
+│  UI   │  (React — Atomic Design)                                             │
+│       ▼                                                                      │
+│  ┌──────────────────────┐                                                    │
+│  │     AppProvider      │  ◄── distributes AppContainer via React context    │
+│  └──────────┬───────────┘                                                    │
+│             ▼                                                                │
+│  ┌──────────────────────┐   hooks: useMovieData, useFilters, useSort,        │
+│  │      HomePage        │◄──────── useWatched, useTheme, useLiveAnnouncer    │
+│  │  (page — data hub)   │                                                    │
+│  └──┬───────┬───────┬───┘                                                    │
+│     │       │       │                                                        │
+│     ▼       ▼       ▼         props ▼ down          callbacks ▲ up           │
+│  Header  SectionTabs  MovieTable ──────────────────────────────────►          │
+│  (org)    (org)        (org)      sort, filter, watched, theme events         │
+│     │                    │                                                    │
+│     ▼                    ▼                                                    │
+│  atoms              MovieRow (mol) ── Badge, RatingBar (atoms)               │
+│  molecules          TableHeaderCell (mol) ── SortArrow (atom)                │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  ▼ = data flows down (props)       ▲ = events flow up (callbacks)
+```
 
 ---
 
