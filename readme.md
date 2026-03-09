@@ -204,7 +204,7 @@ movies-for-hackers/
 ├── index.html                  # Entry point with meta tags + manifest link
 ├── movie_list.md               # Curated movie data (401 entries)
 ├── package.json                # Project config + Electron builder config
-├── vite.config.js              # Vite + SWC, virtual movie-data plugin, vendor chunks
+├── vite.config.js              # Vite + SWC, virtual movie-data plugin, vendor chunks, HMR config
 ├── tsconfig.json               # TypeScript strict config
 ├── capacitor.config.json       # Capacitor native app config
 ├── eslint.config.js            # ESLint flat config
@@ -1129,6 +1129,7 @@ All planned optimizations (P0–P3) have been implemented:
 - **Row virtualization** — `@tanstack/react-virtual` renders only visible rows (~94% DOM reduction)
 - **Vendor chunk splitting** — React and virtual library cached independently from app code
 - **SWC compiler** — `@vitejs/plugin-react-swc` for 30–70% faster HMR/builds
+- **HMR WebSocket** — `hmr.host` explicitly set to `localhost` to prevent WebSocket connection failures in WSL/cross-network environments
 - **Build-time data** — `movie_list.md` pre-parsed to JSON via shared `markdownParser` service (zero runtime parse, zero duplication)
 - **Memoized components** — `React.memo` on all frequently re-rendered components
 - **Stable callbacks** — `useCallback` throughout to prevent unnecessary re-renders

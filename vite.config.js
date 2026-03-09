@@ -39,6 +39,9 @@ export default defineConfig({
   server: {
     port: 5175,
     strictPort: true,
+    hmr: {
+      host: 'localhost',
+    },
   },
   build: {
     target: 'esnext',
