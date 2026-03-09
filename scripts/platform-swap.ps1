@@ -4,8 +4,9 @@
     Ensure node_modules has Windows-native binaries.
 
 .DESCRIPTION
-    Always does a clean pnpm install for the current (Windows) platform.
-    This avoids stale cached modules and cross-platform binary mismatches.
+    Checks if node_modules already contains Windows-native platform binaries.
+    If so, skips reinstall (avoids file-lock conflicts when called from pnpm).
+    If modules are missing or from another platform, does a clean pnpm install.
     Install takes ~5-8s because pnpm reuses its global content store.
 #>
 
@@ -14,6 +15,15 @@ $ErrorActionPreference = 'Stop'
 
 $root = Split-Path $PSScriptRoot
 $nm   = Join-Path $root 'node_modules'
+
+# Detect if modules are already Windows-native by checking platform-specific dirs
+$winMarker = Join-Path $nm '@esbuild\win32-x64'
+$binDir    = Join-Path $nm '.bin'
+
+if ((Test-Path $winMarker) -and (Test-Path $binDir)) {
+    Write-Host '  [windows] node_modules already has Windows binaries — skipping reinstall' -ForegroundColor Green
+    exit 0
+}
 
 Write-Host '  [windows] Cleaning node_modules...' -ForegroundColor Cyan
 if (Test-Path $nm) {

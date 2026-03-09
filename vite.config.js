@@ -35,6 +35,7 @@ function movieDataPlugin() {
 }
 
 export default defineConfig({
+  base: './',
   server: {
     port: 5175,
     strictPort: true,
