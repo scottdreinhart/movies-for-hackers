@@ -278,6 +278,8 @@ movies-for-hackers/
 │   │
 │   ├── components/             # Atomic Design hierarchy
 │   │   ├── providers/          # React context (AppProvider + container hooks)
+│   │   │   ├── AppProvider.tsx # Creates AppContainer context
+│   │   │   └── useAppContainerHooks.ts # useEventBus, useFeatureFlags, useHapticsPort, etc.
 │   │   │
 │   │   ├── atoms/              # UI primitives
 │   │   │   ├── Badge/          # Section category badges
@@ -326,7 +328,7 @@ movies-for-hackers/
 │   │
 │   ├── services/               # Legacy services (being migrated to ports)
 │   │   ├── markdownParser.ts   # Markdown → structured data parser (shared by Vite plugin)
-│   │   ├── registerSW.ts       # Service worker registration for PWA
+│   │   ├── registerSW.ts       # Service worker registration (legacy — superseded by adapter)
 │   │   └── storageService.ts   # localStorage abstraction for persistence
 │   │
 │   ├── styles/                 # Global styles
@@ -409,7 +411,7 @@ StrictMode
                     │               ├── ThemePicker            (molecule)
                     │               │     └── <button>s, <select>
                     │               ├── SearchInput             (atom)
-                    │               ├── SelectDropdown × 6      (atom — genre, format, rated, year, rating)
+                    │               ├── SelectDropdown × 7      (atom — genre, format, rated, year ×2, rating ×2)
                     │               └── Button                  (atom — Reset)
                     │
                     ├── tabs ──► SectionTabs                    (organism)
@@ -493,6 +495,150 @@ StrictMode
 └──────────────────────────────────────────────────────────────────────────────┘
 
   ▼ = data flows down (props)       ▲ = events flow up (callbacks)
+```
+
+#### Screen Layouts
+
+The following wireframes show each application state at every responsive breakpoint.
+Column widths: ☐=2.5rem | Title 19% | Section 9% | Genre 11% | Format 8% | Year 5% | Rated 5% | Rating 6% | Description 34%.
+Breakpoints: **≤ 900 px** hides Section, Format, Rated and shrinks font/padding. **≤ 600 px** additionally hides Genre + Description; theme picker shows icons only.
+
+**Desktop — Ready State (> 900 px)**
+
+```
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│ HEADER (sticky, gradient bg)                                                         │
+│  🎬 Movies for Hackers                          [💻 System] [🌙 Dark] [☀️ Light] ▾  │
+│  ⌕ Search (/)│▾All Genres│▾All Formats│▾All MPAA│Year ▾Min – ▾Max│IMDb ▾Min – ▾Max│ │
+│  [Reset Filters]                                                         142 of 350  │
+├──────────────────────────────────────────────────────────────────────────────────────┤
+│ MAIN                                                                                 │
+│ ┌─ SECTION TABS (flex row, wrapping) ────────────────────────────────────────────┐   │
+│ │ (All 350)(Thrillers 73)(Sci-Fi 167)(Action 13)(Docs 60)(TV Shows 76)(Pndg 12) │   │
+│ └────────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                      │
+│ ┌─ MOVIE TABLE (virtual scroll, 42 px rows, 10 overscan) ───────────────────────┐   │
+│ │ ☐ │ TITLE▲    │ SECTION │ GENRE   │FORMAT│ YEAR │RATED│RATING │ DESCRIPTION    │   │
+│ │───┼───────────┼─────────┼─────────┼──────┼──────┼─────┼───────┼────────────────│   │
+│ │ ☐ │ WarGames  │Thrillers│ Sci-Fi  │ Movie│ 1983 │ PG  │7.1 ██ │ A young man …  │   │
+│ │ ☑ │ Hackers   │Thrillers│ Crime   │ Movie│ 1995 │PG-13│6.2 ██ │ Hackers are …  │   │
+│ │ ☐ │ Sneakers  │Thrillers│ Comedy  │ Movie│ 1992 │PG-13│7.1 ██ │ Complex comp … │   │
+│ │   │    ⋮      │         │         │      │  ⋮   │     │       │                │   │
+│ └────────────────────────────────────────────────────────────────────────────────┘   │
+│ [aria-live="polite" sr-only: "{announcement}"]                                       │
+└──────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Medium Viewport (≤ 900 px) — 3 columns hidden**
+
+```
+┌──────────────────────────────────────────────────────┐
+│ HEADER (padding: 1rem)                                │
+│  🎬 Movies for Hackers       [💻][🌙][☀️] ▾Default  │
+│  ⌕ Search...│▾Genre│▾Format│▾MPAA│                    │
+│  Year ▾Min – ▾Max│IMDb ▾Min – ▾Max│Reset│ 142 / 350  │
+├──────────────────────────────────────────────────────┤
+│ MAIN (padding: 0.5rem)                                │
+│ (All 350)(Thrillers)(Sci-Fi)(Action)(Docs)(TV)(Pndg)  │
+│                                                        │
+│ ┌TABLE (font: 0.8rem) ────────────────────────────┐  │
+│ │ ☐ │ TITLE▲   │ GENRE  │ YEAR │ RATING │ DESC…   │  │
+│ │───┼──────────┼────────┼──────┼────────┼─────────│  │
+│ │ ☐ │ WarGames │ Sci-Fi │ 1983 │ 7.1 ██ │ A young…│  │
+│ │ ☑ │ Hackers  │ Crime  │ 1995 │ 6.2 ██ │ Hackers…│  │
+│ └──────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────┘
+  Hidden: Section, Format, Rated
+```
+
+**Small / Mobile Viewport (≤ 600 px) — 5 columns hidden**
+
+```
+┌────────────────────────────────────┐
+│ HEADER                              │
+│  🎬 Movies for Hackers [💻][🌙][☀️]│
+│  ⌕ Search…│▾Genre│▾Format│▾MPAA│   │
+│  Year▾–▾│IMDb▾–▾│Reset│ 0 / 350    │
+├────────────────────────────────────┤
+│ (All)(Thrillers)(Sci-Fi)(Action)    │
+│ (Docs)(TV Shows)(Pending)           │
+│                                      │
+│ ┌TABLE──────────────────────────┐   │
+│ │ ☐ │ TITLE▲   │ YEAR │ RATING │   │
+│ │───┼──────────┼──────┼────────│   │
+│ │ ☐ │ WarGames │ 1983 │ 7.1 ██ │   │
+│ │ ☑ │ Hackers  │ 1995 │ 6.2 ██ │   │
+│ └────────────────────────────────┘  │
+└────────────────────────────────────┘
+  Hidden: Section, Format, Rated, Genre, Description
+  Theme picker: icons only (labels hidden)
+```
+
+**Loading State**
+
+```
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│ HEADER (shows "0 of 0")                                                              │
+│  🎬 Movies for Hackers                          [💻 System] [🌙 Dark] [☀️ Light] ▾  │
+│  ⌕ Search (/)│▾All Genres│▾All Formats│▾All MPAA│Year ▾Min – ▾Max│IMDb ▾Min – ▾Max│ │
+│  [Reset Filters]                                                           0 of 0    │
+├──────────────────────────────────────────────────────────────────────────────────────┤
+│ MAIN  (no section tabs — entries not yet loaded)                                     │
+│                                                                                      │
+│                              ╭───╮                                                   │
+│                              │ ◠ │  ← 40×40 spinning ring                            │
+│                              ╰───╯                                                   │
+│                       Loading movie data...                                          │
+│                                                                                      │
+└──────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Error State (data load failed)**
+
+```
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│ HEADER (shows "0 of 0")                                                              │
+├──────────────────────────────────────────────────────────────────────────────────────┤
+│ MAIN  (no section tabs)                                                              │
+│                                                                                      │
+│                                 ⚠️                                                   │
+│          Unable to load movie data. Please try refreshing the page.                  │
+│                                                                                      │
+└──────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Empty Search Results**
+
+```
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│ HEADER (active filters, shows "0 of 350")                                            │
+│  ⌕ xyznonexist │▾All Genres│…                                             0 of 350  │
+├──────────────────────────────────────────────────────────────────────────────────────┤
+│ SECTION TABS (still visible — raw entries exist)                                     │
+│ (All 350)(Thrillers 73)(Sci-Fi 167)(Action 13)(Docs 60)(TV Shows 76)(Pending 12)    │
+│                                                                                      │
+│                                 🔍                                                   │
+│                  No entries match your filters                                        │
+│                                                                                      │
+└──────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+**ErrorBoundary Fallback (uncaught render exception — replaces entire app)**
+
+```
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                      │
+│                              Something went wrong                                    │
+│                                                                                      │
+│                          {error.message text}                                        │
+│                                                                                      │
+│                     ┌──────────────────────────────┐                                 │
+│                     │ <pre> full error stack trace  │                                 │
+│                     └──────────────────────────────┘                                 │
+│                                                                                      │
+│                           [ Reload Page ]                                            │
+│                                                                                      │
+└──────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---

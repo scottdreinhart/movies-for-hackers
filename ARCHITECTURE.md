@@ -196,7 +196,8 @@ These patterns are not currently implemented but are architecturally compatible:
 | `app/eventLog/eventLogger.ts` | Snapshot + Replay |
 | `app/compositionRoot.ts` | Composition Root |
 | `components/providers/AppProvider.tsx` | Composition Root, DI |
-| `hooks/useTheme.ts` | Adapter, Repository |
+| `components/providers/useAppContainerHooks.ts` | Composition Root, Law of Demeter |
+| `hooks/useTheme.ts` | Functional Core / Imperative Shell (legacy storageService) |
 | `hooks/useHapticCallback.ts` | Strategy, Tell Don't Ask |
 | `hooks/useDebouncedInput.ts` | Policy Object |
 | `hooks/useLiveAnnouncer.ts` | Policy Object |
