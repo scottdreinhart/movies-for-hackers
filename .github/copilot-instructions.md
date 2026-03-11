@@ -31,13 +31,38 @@
 
 ## Shell Routing
 
-| Target | Shell | Key scripts |
-|--------|-------|-------------|
-| Windows | PowerShell | `setup:win`, `dev:win`, `build:win`, `electron:dev:win`, `electron:build:win` |
-| Linux | Bash (WSL: Ubuntu) | `setup:linux`, `dev:linux`, `build:linux`, `electron:build:linux` |
-| macOS / iOS | Bash / Zsh (Apple) | `electron:build:mac`, `cap:*:ios` |
-| Android | Any | `cap:*:android` |
-| Cross-platform | Any | `dev`, `build`, `preview`, `lint`, `typecheck`, `format`, `check`, `fix`, `validate`, `clean` |
+Default to **WSL: Ubuntu** for all development work.
+
+Use PowerShell only for Windows-native Electron packaging:
+- `pnpm run electron:build:win`
+
+Use native or remote macOS only for:
+- `pnpm run electron:build:mac`
+- `pnpm run cap:init:ios`
+- `pnpm run cap:open:ios`
+- `pnpm run cap:run:ios`
+
+Use Android-capable tooling only for:
+- `pnpm run cap:init:android`
+- `pnpm run cap:open:android`
+- `pnpm run cap:run:android`
+
+All other tasks, including install, dev, lint, format, typecheck, validate, build, preview, Electron dev, Electron preview, Electron Linux build, cleanup, and WASM work, must use **WSL: Ubuntu**.
+
+### Repository shell defaults
+
+For this repository, assume **WSL: Ubuntu** unless the user is explicitly doing one of these:
+
+- `pnpm run electron:build:win`
+- `pnpm run electron:build:mac`
+- `pnpm run cap:init:android`
+- `pnpm run cap:open:android`
+- `pnpm run cap:run:android`
+- `pnpm run cap:init:ios`
+- `pnpm run cap:open:ios`
+- `pnpm run cap:run:ios`
+
+All other scripts should default to **WSL: Ubuntu**.
 
 Never run `:win` scripts in WSL. Never run `:linux` scripts in PowerShell.
 
@@ -85,3 +110,4 @@ All three must pass. The `prebuild` hook runs lint automatically.
 6. Commit without passing `pnpm validate`
 7. Invent scripts that don't exist in `package.json`
 8. Mix platform-specific scripts across wrong shells
+9. Default to PowerShell for routine development — use WSL: Ubuntu

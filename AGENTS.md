@@ -15,24 +15,144 @@
 
 ---
 
-## 2. Shell & Environment Routing
+## 2. Shell and Build-Environment Governance
 
-All platform-specific work MUST be routed to the correct shell and environment. There is no cross-compilation; each target OS builds on its native host.
+The default development shell for this repository is **WSL: Ubuntu**.
 
-| Target | Shell | Environment | Notes |
-|--------|-------|-------------|-------|
-| **Windows** (desktop, web dev) | **PowerShell** | Windows host | All `:win` scripts. `scripts/platform-swap.ps1` handles native binary cleanup via robocopy. |
-| **Linux** (desktop, CI) | **Bash (WSL: Ubuntu)** | WSL 2 on Windows, or native Linux | All `:linux` scripts. `scripts/platform-swap.sh` handles ext4+tar binary swap. CI runs on `ubuntu-latest`. |
-| **macOS / iOS** | **Bash / Zsh** | Native Apple hardware | `electron:build:mac`, `cap:*:ios` scripts. Requires Xcode for iOS. macOS builds require macOS host. |
-| **Android** | **PowerShell or Bash** | Any host with Android Studio + SDK | `cap:*:android` scripts. Works from Windows or WSL. |
-| **Cross-platform** (lint, typecheck, format) | **Any** | Any | `check`, `fix`, `validate`, `typecheck`, `lint`, `format`, `preview` — these have no platform dependency. |
+Mandatory rule:
+- Unless the task is specifically an Electron or Capacitor platform-build workflow, use **WSL: Ubuntu**
+- Do not default to PowerShell
+- Do not suggest PowerShell for ordinary development tasks
+- Do not switch shells without a platform-specific reason
 
-### Critical Rules
+### Default shell: WSL: Ubuntu
 
-- When the user says "use PowerShell," they mean the Windows PowerShell terminal — **not** PowerShell Core on Linux.
-- When the user says "use WSL" or "use Linux," they mean WSL: Ubuntu with Bash.
-- Never suggest running `:win` scripts under WSL or `:linux` scripts under PowerShell.
-- Never suggest `sudo` on Windows or `Set-ExecutionPolicy` on Linux.
+Use **WSL: Ubuntu** for all general repository work, including:
+- `pnpm install`
+- `pnpm run dev`
+- `pnpm run start`
+- `pnpm run build`
+- `pnpm run preview`
+- `pnpm run build:preview`
+- `pnpm run lint`
+- `pnpm run lint:fix`
+- `pnpm run format`
+- `pnpm run format:check`
+- `pnpm run typecheck`
+- `pnpm run check`
+- `pnpm run fix`
+- `pnpm run validate`
+- `pnpm run clean`
+- `pnpm run clean:node`
+- `pnpm run clean:all`
+- `pnpm run reinstall`
+- `pnpm run wasm:build`
+- `pnpm run wasm:build:debug`
+- general source editing
+- dependency installation
+- local Vite development
+- general web builds
+- quality checks
+- maintenance tasks
+- documentation tasks
+
+If the task is not explicitly a native Electron packaging task or a Capacitor native-platform task, use **WSL: Ubuntu**.
+
+### Exception: Electron native packaging
+
+Use a platform-native environment only when the task is explicitly building a native Electron package for that platform.
+
+Routing:
+- `pnpm run electron:build:win` → **PowerShell**
+- `pnpm run electron:build:linux` → **WSL: Ubuntu**
+- `pnpm run electron:build:mac` → **native or remote macOS**
+
+Notes:
+- `pnpm run electron:dev` remains **WSL: Ubuntu**
+- `pnpm run electron:preview` remains **WSL: Ubuntu**
+- only native packaging should switch away from the default shell where required
+
+### Exception: Capacitor native-platform tasks
+
+Use a platform-native environment only when the task is explicitly a Capacitor native-platform workflow.
+
+Routing:
+- `pnpm run cap:init:android` → Android-capable environment
+- `pnpm run cap:open:android` → Android-capable environment
+- `pnpm run cap:run:android` → Android-capable environment
+- `pnpm run cap:init:ios` → native or remote macOS
+- `pnpm run cap:open:ios` → native or remote macOS
+- `pnpm run cap:run:ios` → native or remote macOS
+- `pnpm run cap:sync` → **WSL: Ubuntu** unless a native platform environment is explicitly required
+
+### PowerShell restriction
+
+PowerShell is **not** the default shell.
+
+Use PowerShell only when:
+- the task is explicitly `pnpm run electron:build:win`
+- the task is explicitly Windows-native packaging or release work for Electron
+- repository governance explicitly says a Windows-native tool must be used
+
+Do not use PowerShell for:
+- installs
+- linting
+- formatting
+- typechecking
+- general Vite development
+- ordinary web builds
+- docs
+- cleanup
+- WASM builds
+- Electron dev mode
+
+### Decision rule
+
+Before suggesting commands, determine whether the task is:
+
+1. General development or maintenance
+   → use **WSL: Ubuntu**
+
+2. Electron native packaging
+   → use the target platform environment only for that packaging task
+
+3. Capacitor native-platform work
+   → use the target platform environment only for that native task
+
+If there is no explicit Electron or Capacitor native-build requirement, use **WSL: Ubuntu**.
+
+### Hard-stop rules
+
+Never:
+- default to PowerShell for routine development
+- present PowerShell as interchangeable with WSL for ordinary tasks
+- switch to PowerShell unless the task is a Windows-native Electron packaging flow
+- claim iOS tasks can run fully from Windows or WSL
+- use the wrong shell when the repository already defines the correct route
+
+### Required self-check
+
+Before responding, verify:
+- Is this an ordinary dev task? → use **WSL: Ubuntu**
+- Is this specifically Electron Windows packaging? → use **PowerShell**
+- Is this specifically Electron mac packaging or iOS work? → use **native or remote macOS**
+- Is this Android native work? → use the Android-capable environment
+- Otherwise → use **WSL: Ubuntu**
+
+### Repository shell defaults
+
+For this repository, assume **WSL: Ubuntu** unless the user is explicitly doing one of these:
+
+- `pnpm run electron:build:win`
+- `pnpm run electron:build:mac`
+- `pnpm run cap:init:android`
+- `pnpm run cap:open:android`
+- `pnpm run cap:run:android`
+- `pnpm run cap:init:ios`
+- `pnpm run cap:open:ios`
+- `pnpm run cap:run:ios`
+
+All other scripts should default to **WSL: Ubuntu**.
 
 ---
 
@@ -234,10 +354,11 @@ The `prebuild` hook automatically runs `pnpm lint` before every build.
 6. Modify `electron/main.cjs` security settings (sandbox, contextIsolation, nodeIntegration, webSecurity).
 7. Remove or weaken Content Security Policy, navigation guards, or window-open handlers.
 8. Run `:win` scripts under WSL/Bash or `:linux` scripts under PowerShell.
-9. Suggest `sudo` on Windows or Windows-specific commands on Linux/macOS.
-10. Commit without running `pnpm validate`.
-11. Add dependencies without checking for browser-native alternatives first.
-12. Refactor working code that the user did not ask to change.
+9. Default to PowerShell for routine development — use WSL: Ubuntu unless the task is explicitly Windows-native Electron packaging.
+10. Suggest `sudo` on Windows or Windows-specific commands on Linux/macOS.
+11. Commit without running `pnpm validate`.
+12. Add dependencies without checking for browser-native alternatives first.
+13. Refactor working code that the user did not ask to change.
 
 ---
 
