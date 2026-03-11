@@ -156,7 +156,181 @@ All other scripts should default to **WSL: Ubuntu**.
 
 ---
 
-## 3. Package Manager Policy
+## 3. Language, Syntax, and Script Governance
+
+This repository has an explicit language and syntax policy to prevent toolchain fragmentation and orphaned scripts.
+
+### Approved Primary Languages
+
+The preferred and authoritative implementation languages for this repository are:
+
+- **HTML** — markup and document structure
+- **CSS** — styling and layout
+- **JavaScript** — runtime compatibility layer
+- **TypeScript** — primary application logic and type safety
+- **AssemblyScript** — WASM performance-sensitive modules (within existing WASM pipeline)
+- **WebAssembly** — compiled WASM outputs (through repository's existing build path only)
+
+These languages are the default choice for implementation, tooling, examples, refactors, and new code.
+
+### Language Priority Order
+
+When choosing how to implement something, prefer this order:
+
+1. **TypeScript** — primary choice for application logic and tooling
+2. **JavaScript** — where the repository already uses it or where TypeScript is not applicable
+3. **HTML** — for structure and semantic markup
+4. **CSS** — for styling and layout
+5. **AssemblyScript** — only within the existing WASM pipeline for performance-sensitive code
+6. **WebAssembly** — only through the repository's existing WASM build path
+
+### Default Implementation Rule
+
+Before creating new code, first ask:
+
+- Can this be done in the existing TypeScript or JavaScript application layer?
+- Can this be done inside the current HTML/CSS frontend?
+- Does this belong in the existing AssemblyScript/WASM path already defined by the repository?
+
+If yes, do that. Do not introduce a different language or runtime.
+
+### No Orphaned Scripts Rule
+
+Do **not** create one-off scripts, helper files, or ad hoc automation in random languages.
+
+**Never** introduce orphaned scripts in languages outside the approved stack unless explicitly requested and documented.
+
+Examples of disallowed drift unless explicitly authorized:
+- Python helper scripts
+- Bash utilities added when the task belongs in `package.json` scripts or existing Node tooling
+- PowerShell utilities for ordinary project logic
+- Ruby, PHP, Perl, Go, Rust, Java, C#, Lua, or other side-language helpers
+- duplicate build scripts outside the current package-driven workflow
+- standalone conversion or codegen scripts in a different language when TypeScript or JavaScript can do the job
+
+If automation is needed:
+
+1. First: prefer an existing `package.json` script
+2. Then: prefer a Node-based script in the existing repo conventions
+3. Then: prefer TypeScript or JavaScript in the existing `scripts/` structure
+4. Only: use another language if governance explicitly authorizes it
+
+### No Parallel Toolchain Rule
+
+Do **not** create parallel implementations of the same concern in multiple languages.
+
+Examples:
+- Do not add a Python build helper when the repo already uses Node scripts
+- Do not add a shell script that duplicates an existing `package.json` script
+- Do not add a second config format or second linter pipeline when the repo already has one
+- Do not create duplicate wrappers around existing Vite, Electron, Capacitor, or WASM workflows
+
+There should be one clear implementation path per responsibility.
+
+### File Placement and Responsibility Rule
+
+New files must live in the correct existing system:
+
+- `src/` for app code
+- `src/domain/` for pure domain logic
+- `src/app/` for orchestration, services, side effects, and context
+- `src/components/` for UI components (Atomic Design hierarchy)
+- `src/hooks/` for React hooks
+- `assembly/` for AssemblyScript sources (WASM pipeline)
+- `scripts/` for approved Node-based build or utility scripts aligned with repository conventions
+- `public/` for static assets
+- Config files only where the repository already expects them
+
+Do **not** create random utility scripts at repository root.
+Do **not** create `misc/`, `temp/`, `helpers/`, `scripts2/`, `tools-old/`, or other undisciplined folders.
+Do **not** scatter automation across multiple languages or project root.
+
+### Preferred Syntax Rule
+
+When generating code, prefer the syntax and style already established by the repository:
+
+- modern TypeScript and JavaScript syntax (ES2020+)
+- ESM (`import`/`export`) module syntax
+- existing import/export conventions
+- existing lint and format rules (ESLint 10 flat config, Prettier 3)
+- existing Vite and Node-compatible patterns
+- existing AssemblyScript and WASM integration path
+
+Do **not** introduce alternate syntax styles or unrelated framework conventions.
+
+### Language Selection Decision Rule
+
+Before writing code, determine the correct language from this hierarchy:
+
+1. If the feature belongs to the frontend app → prefer **TypeScript**
+2. If the repository already uses JavaScript for that subsystem → follow the existing pattern
+3. If the task is markup or styling → use **HTML/CSS**
+4. If the task belongs to the existing WASM pipeline → use **AssemblyScript** and existing WASM build path
+5. Only use raw **WebAssembly** where the repository already expects compiled WASM outputs
+
+If the task can be handled in the approved languages, do **not** introduce another language.
+
+### Configuration and Tooling Rule
+
+Prefer repository-native tooling already present in the project:
+
+- Vite 6
+- TypeScript 5.9
+- ESLint 10 (flat config)
+- Prettier 3
+- SWC (via `@vitejs/plugin-react-swc`)
+- Electron 40 + electron-builder 26
+- Capacitor 8
+- AssemblyScript (WASM pipeline)
+- Node-based `package.json` scripts
+- pnpm 10.30.3
+
+Do **not** add alternative tooling stacks that increase fragmentation or competition.
+
+### Refactor Rule
+
+When refactoring:
+
+- consolidate toward the approved languages
+- reduce script sprawl and orphaned helpers
+- remove duplication where appropriate
+- do **not** migrate code into a new language without explicit instruction
+- prefer folding small orphaned logic into the existing TypeScript/JavaScript structure
+
+### Documentation Rule
+
+When documenting workflows:
+
+- describe the primary path using the approved languages and current toolchain
+- do **not** document unofficial side-language workflows
+- do **not** present alternative runtimes as equal options when they are not approved
+
+### Hard-Stop Rules
+
+**Never:**
+- introduce non-approved languages for ordinary repository tasks
+- create helper scripts in random languages
+- create duplicate build or tooling paths
+- scatter automation across multiple runtimes
+- bypass the existing TypeScript/JavaScript/AssemblyScript/WASM architecture
+- invent a second way to do the same task when the repo already has a governed path
+
+### Required Self-Check
+
+Before generating code, scripts, or documentation, verify:
+
+- Am I using one of the approved repository languages?
+- Could this be done in TypeScript or JavaScript instead of another language?
+- Am I creating a one-off orphaned script?
+- Does this belong in an existing `package.json` script or Node-based workflow?
+- Am I preserving the existing HTML/CSS/TS/JS/AssemblyScript/WASM architecture?
+- Am I avoiding a duplicate toolchain or parallel implementation?
+
+If any answer is no, fix it before responding.
+
+---
+
+## 4. Package Manager Policy
 
 ### Authorized
 
@@ -190,7 +364,7 @@ bun / bun add / bunx
 
 ---
 
-## 4. Architecture Constraints
+## 5. Architecture Constraints
 
 ### Layer Dependency Rule
 
@@ -249,7 +423,7 @@ Agents must not propose alternatives to patterns that are already implemented. R
 
 ---
 
-## 5. Build & Release Facts
+## 6. Build & Release Facts
 
 ### Vite Build
 
@@ -291,7 +465,7 @@ Agents must not propose alternatives to patterns that are already implemented. R
 
 ---
 
-## 6. Code Quality Gates
+## 7. Code Quality Gates
 
 Before committing any change, all of the following must pass:
 
@@ -307,7 +481,7 @@ The `prebuild` hook automatically runs `pnpm lint` before every build.
 
 ---
 
-## 7. File Naming & Style Conventions
+## 8. File Naming & Style Conventions
 
 | Item | Convention | Example |
 |------|-----------|---------|
@@ -322,7 +496,7 @@ The `prebuild` hook automatically runs `pnpm lint` before every build.
 
 ---
 
-## 8. Dependency Policy
+## 9. Dependency Policy
 
 - **Runtime dependencies** must be justified. Prefer browser-native APIs.
 - **Dev dependencies** require a `devDependencies` entry, never `dependencies`.
@@ -332,7 +506,7 @@ The `prebuild` hook automatically runs `pnpm lint` before every build.
 
 ---
 
-## 9. Git & Commit Conventions
+## 10. Git & Commit Conventions
 
 - **Branch:** `master` (default)
 - **Remote:** `origin` → `github.com/scottdreinhart/movies-for-hackers`
@@ -344,7 +518,7 @@ The `prebuild` hook automatically runs `pnpm lint` before every build.
 
 ---
 
-## 10. What Agents Must Never Do
+## 11. What Agents Must Never Do
 
 1. Install or recommend `npm`, `npx` (except Capacitor CLI), `yarn`, or `bun`.
 2. Create `package-lock.json`, `yarn.lock`, or `bun.lockb`.
@@ -362,7 +536,7 @@ The `prebuild` hook automatically runs `pnpm lint` before every build.
 
 ---
 
-## 11. Cross-References
+## 12. Cross-References
 
 | Document | Purpose |
 |----------|---------|
