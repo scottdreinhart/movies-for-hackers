@@ -5,6 +5,14 @@
 
 ---
 
+## ⚠️ Default Development Shell
+
+**Bash (WSL: Ubuntu)** is the default development shell for this repository.
+
+Do not default to PowerShell unless the task is specifically a Windows packaging workflow such as `pnpm run electron:build:win`.
+
+---
+
 ## Identity
 
 - **Project:** Movies for Hackers — a cross-platform movie catalog (web, desktop, mobile)
