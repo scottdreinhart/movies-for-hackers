@@ -60,10 +60,7 @@ export const DEFAULT_FLAGS: Readonly<FeatureFlags> = Object.freeze({
 // ── Flag evaluation ────────────────────────────────────────────
 
 /** Check if a specific flag is enabled. */
-export function isEnabled(
-  flags: FeatureFlags,
-  flag: keyof FeatureFlags,
-): boolean {
+export function isEnabled(flags: FeatureFlags, flag: keyof FeatureFlags): boolean {
   return flags[flag];
 }
 

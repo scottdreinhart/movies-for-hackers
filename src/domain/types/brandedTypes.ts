@@ -61,7 +61,15 @@ export function toMovieUrl(value: string): MovieUrl {
 
 // ── Type-safe unwrap helpers ───────────────────────────────────
 
-export function unwrapRating(r: Rating): number { return r as number; }
-export function unwrapYear(y: Year): number { return y as number; }
-export function unwrapTitle(t: MovieTitle): string { return t as string; }
-export function unwrapUrl(u: MovieUrl): string { return u as string; }
+export function unwrapRating(r: Rating): number {
+  return r as number;
+}
+export function unwrapYear(y: Year): number {
+  return y as number;
+}
+export function unwrapTitle(t: MovieTitle): string {
+  return t as string;
+}
+export function unwrapUrl(u: MovieUrl): string {
+  return u as string;
+}

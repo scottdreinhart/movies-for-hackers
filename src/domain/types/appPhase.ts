@@ -17,7 +17,11 @@ export type AppPhase =
   | { readonly type: 'idle' }
   | { readonly type: 'loading' }
   | { readonly type: 'ready'; readonly entries: ReadonlyArray<MovieEntry> }
-  | { readonly type: 'error'; readonly error: Error; readonly staleEntries?: ReadonlyArray<MovieEntry> };
+  | {
+      readonly type: 'error';
+      readonly error: Error;
+      readonly staleEntries?: ReadonlyArray<MovieEntry>;
+    };
 
 // ── Constructors (prevent accidental bare-object creation) ─────
 
@@ -25,8 +29,11 @@ export const AppPhases = {
   idle: (): AppPhase => ({ type: 'idle' }),
   loading: (): AppPhase => ({ type: 'loading' }),
   ready: (entries: ReadonlyArray<MovieEntry>): AppPhase => ({ type: 'ready', entries }),
-  error: (error: Error, staleEntries?: ReadonlyArray<MovieEntry>): AppPhase =>
-    ({ type: 'error', error, staleEntries }),
+  error: (error: Error, staleEntries?: ReadonlyArray<MovieEntry>): AppPhase => ({
+    type: 'error',
+    error,
+    staleEntries,
+  }),
 } as const;
 
 // ── Type guards ────────────────────────────────────────────────
@@ -59,9 +66,13 @@ export function matchPhase<T>(
   },
 ): T {
   switch (phase.type) {
-    case 'idle':    return handlers.idle();
-    case 'loading': return handlers.loading();
-    case 'ready':   return handlers.ready(phase.entries);
-    case 'error':   return handlers.error(phase.error, phase.staleEntries);
+    case 'idle':
+      return handlers.idle();
+    case 'loading':
+      return handlers.loading();
+    case 'ready':
+      return handlers.ready(phase.entries);
+    case 'error':
+      return handlers.error(phase.error, phase.staleEntries);
   }
 }

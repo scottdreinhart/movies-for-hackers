@@ -9,7 +9,11 @@ interface SearchInputProps {
   placeholder?: string;
 }
 
-const SearchInput = memo(function SearchInput({ value, onChange, placeholder = 'Search...' }: SearchInputProps) {
+const SearchInput = memo(function SearchInput({
+  value,
+  onChange,
+  placeholder = 'Search...',
+}: SearchInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [local, handleChange] = useDebouncedInput(value, onChange);
 

@@ -90,35 +90,32 @@ export type AppCommand =
 // ── Command constructors (Tell, Don't Ask) ─────────────────────
 
 export const Commands = {
-  setFilter: (key: keyof FilterState, value: string): SetFilterCommand =>
-    ({ type: 'SET_FILTER', key, value }),
+  setFilter: (key: keyof FilterState, value: string): SetFilterCommand => ({
+    type: 'SET_FILTER',
+    key,
+    value,
+  }),
 
-  resetFilters: (): ResetFiltersCommand =>
-    ({ type: 'RESET_FILTERS' }),
+  resetFilters: (): ResetFiltersCommand => ({ type: 'RESET_FILTERS' }),
 
-  toggleSort: (column: string): ToggleSortCommand =>
-    ({ type: 'TOGGLE_SORT', column }),
+  toggleSort: (column: string): ToggleSortCommand => ({ type: 'TOGGLE_SORT', column }),
 
-  resetSort: (): ResetSortCommand =>
-    ({ type: 'RESET_SORT' }),
+  resetSort: (): ResetSortCommand => ({ type: 'RESET_SORT' }),
 
-  toggleWatched: (url: string): ToggleWatchedCommand =>
-    ({ type: 'TOGGLE_WATCHED', url }),
+  toggleWatched: (url: string): ToggleWatchedCommand => ({ type: 'TOGGLE_WATCHED', url }),
 
-  setThemeMode: (mode: ThemeMode): SetThemeModeCommand =>
-    ({ type: 'SET_THEME_MODE', mode }),
+  setThemeMode: (mode: ThemeMode): SetThemeModeCommand => ({ type: 'SET_THEME_MODE', mode }),
 
-  setThemePalette: (palette: ThemePalette): SetThemePaletteCommand =>
-    ({ type: 'SET_THEME_PALETTE', palette }),
+  setThemePalette: (palette: ThemePalette): SetThemePaletteCommand => ({
+    type: 'SET_THEME_PALETTE',
+    palette,
+  }),
 
-  selectSection: (section: string): SelectSectionCommand =>
-    ({ type: 'SELECT_SECTION', section }),
+  selectSection: (section: string): SelectSectionCommand => ({ type: 'SELECT_SECTION', section }),
 
-  openMovie: (url: string): OpenMovieCommand =>
-    ({ type: 'OPEN_MOVIE', url }),
+  openMovie: (url: string): OpenMovieCommand => ({ type: 'OPEN_MOVIE', url }),
 
-  loadData: (): LoadDataCommand =>
-    ({ type: 'LOAD_DATA' }),
+  loadData: (): LoadDataCommand => ({ type: 'LOAD_DATA' }),
 } as const;
 
 // ── Sort state snapshot (for reducer-style handling) ───────────

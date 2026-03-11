@@ -10,7 +10,12 @@
  */
 
 import type { MovieEntry, SectionCounts, RatingTier, FilterState } from '../../types';
-import { classifyRating, getTierColor, formatRating, ratingPercentage } from '../policies/ratingPolicy';
+import {
+  classifyRating,
+  getTierColor,
+  formatRating,
+  ratingPercentage,
+} from '../policies/ratingPolicy';
 import { SECTION_META } from '../../constants/sectionMeta';
 
 // ── Aggregate selectors ────────────────────────────────────────

@@ -11,7 +11,13 @@ interface TableHeaderCellProps {
   onSort: (col: string) => void;
 }
 
-const TableHeaderCell = memo(function TableHeaderCell({ label, columnKey, sortCol, sortDir, onSort }: TableHeaderCellProps) {
+const TableHeaderCell = memo(function TableHeaderCell({
+  label,
+  columnKey,
+  sortCol,
+  sortDir,
+  onSort,
+}: TableHeaderCellProps) {
   const isActive = sortCol === columnKey;
   const ariaSortValue = isActive ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none';
   const handleSort = useCallback(() => onSort(columnKey), [onSort, columnKey]);

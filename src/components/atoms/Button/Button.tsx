@@ -10,7 +10,13 @@ interface ButtonProps {
   className?: string;
 }
 
-export default function Button({ onClick, active = false, children, title, className = '' }: ButtonProps) {
+export default function Button({
+  onClick,
+  active = false,
+  children,
+  title,
+  className = '',
+}: ButtonProps) {
   const handleClick = useHapticCallback(onClick, 'medium');
 
   return (

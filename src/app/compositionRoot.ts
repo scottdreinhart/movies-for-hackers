@@ -14,7 +14,13 @@
  * @pattern Functional Core, Imperative Shell
  */
 
-import type { StoragePort, HapticsPort, MediaQueryPort, ServiceWorkerPort, ThemePort } from '../domain/ports';
+import type {
+  StoragePort,
+  HapticsPort,
+  MediaQueryPort,
+  ServiceWorkerPort,
+  ThemePort,
+} from '../domain/ports';
 import type { EventBus } from '../domain/events';
 import type { FeatureFlags } from '../domain/featureFlags';
 import type { WatchedRepository, ThemeRepository, SettingsRepository } from './repositories';
@@ -66,9 +72,7 @@ export interface AppContainer {
  * Build the full application container.
  * Call once at startup.
  */
-export function createAppContainer(
-  flagOverrides?: Partial<FeatureFlags>,
-): AppContainer {
+export function createAppContainer(flagOverrides?: Partial<FeatureFlags>): AppContainer {
   // 1. Storage first — repositories depend on it
   const storage = createLocalStorageAdapter();
 
@@ -84,9 +88,7 @@ export function createAppContainer(
   const eventBus = createEventBus();
 
   // 4. Adapters — selected based on feature flags, with null-object fallbacks
-  const haptics = isEnabled(flags, 'haptics')
-    ? createBrowserHapticsAdapter()
-    : noopHaptics;
+  const haptics = isEnabled(flags, 'haptics') ? createBrowserHapticsAdapter() : noopHaptics;
 
   const serviceWorker = isEnabled(flags, 'serviceWorker')
     ? createBrowserServiceWorkerAdapter()
@@ -105,9 +107,7 @@ export function createAppContainer(
   );
 
   // 7. Event logger (optional)
-  const eventLogger = isEnabled(flags, 'eventLog')
-    ? createEventLogger(eventBus)
-    : null;
+  const eventLogger = isEnabled(flags, 'eventLog') ? createEventLogger(eventBus) : null;
 
   return {
     flags,

@@ -7,7 +7,12 @@ interface SelectDropdownProps {
   placeholder?: string;
 }
 
-export default function SelectDropdown({ value, onChange, options = [], placeholder = '' }: SelectDropdownProps) {
+export default function SelectDropdown({
+  value,
+  onChange,
+  options = [],
+  placeholder = '',
+}: SelectDropdownProps) {
   return (
     <select
       className={styles.select}

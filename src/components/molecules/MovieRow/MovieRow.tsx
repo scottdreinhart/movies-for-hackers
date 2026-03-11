@@ -17,10 +17,7 @@ interface MovieRowProps {
  */
 function MovieRow({ entry, isWatched, isFocused, onToggleWatched }: MovieRowProps) {
   const meta = SECTION_META[entry.section] || { variant: '', short: entry.section };
-  const handleToggle = useHapticCallback(
-    () => onToggleWatched(entry.url),
-    'light',
-  );
+  const handleToggle = useHapticCallback(() => onToggleWatched(entry.url), 'light');
 
   const rowClass = [styles.row, isWatched && styles.watched, isFocused && styles.focused]
     .filter(Boolean)

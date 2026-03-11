@@ -27,7 +27,12 @@ interface SectionTabsProps {
   onSelect: (section: string) => void;
 }
 
-const SectionTabs = memo(function SectionTabs({ activeSection, sectionCounts, totalCount, onSelect }: SectionTabsProps) {
+const SectionTabs = memo(function SectionTabs({
+  activeSection,
+  sectionCounts,
+  totalCount,
+  onSelect,
+}: SectionTabsProps) {
   return (
     <div className={styles.tabs}>
       <MemoTab

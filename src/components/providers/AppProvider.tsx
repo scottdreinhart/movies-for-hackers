@@ -32,11 +32,7 @@ export function AppProvider({ flagOverrides, children }: AppProviderProps) {
     [],
   );
 
-  return (
-    <AppContainerContext.Provider value={container}>
-      {children}
-    </AppContainerContext.Provider>
-  );
+  return <AppContainerContext.Provider value={container}>{children}</AppContainerContext.Provider>;
 }
 
 // ── Hook ───────────────────────────────────────────────────────

@@ -1,1 +1,5 @@
-export { createCommandDispatcher, type CommandDispatcher, type CommandHandler } from './commandDispatcher';
+export {
+  createCommandDispatcher,
+  type CommandDispatcher,
+  type CommandHandler,
+} from './commandDispatcher';

@@ -111,33 +111,62 @@ function ts(): number {
 }
 
 export const DomainEvents = {
-  dataLoaded: (count: number): DataLoadedEvent =>
-    ({ type: 'DataLoaded', count, timestamp: ts() }),
+  dataLoaded: (count: number): DataLoadedEvent => ({ type: 'DataLoaded', count, timestamp: ts() }),
 
-  dataLoadFailed: (error: string): DataLoadFailedEvent =>
-    ({ type: 'DataLoadFailed', error, timestamp: ts() }),
+  dataLoadFailed: (error: string): DataLoadFailedEvent => ({
+    type: 'DataLoadFailed',
+    error,
+    timestamp: ts(),
+  }),
 
-  filterChanged: (key: keyof FilterState, value: string, resultCount: number): FilterChangedEvent =>
-    ({ type: 'FilterChanged', key, value, resultCount, timestamp: ts() }),
+  filterChanged: (
+    key: keyof FilterState,
+    value: string,
+    resultCount: number,
+  ): FilterChangedEvent => ({ type: 'FilterChanged', key, value, resultCount, timestamp: ts() }),
 
-  filtersReset: (resultCount: number): FiltersResetEvent =>
-    ({ type: 'FiltersReset', resultCount, timestamp: ts() }),
+  filtersReset: (resultCount: number): FiltersResetEvent => ({
+    type: 'FiltersReset',
+    resultCount,
+    timestamp: ts(),
+  }),
 
-  sortChanged: (column: string, direction: SortDirection): SortChangedEvent =>
-    ({ type: 'SortChanged', column, direction, timestamp: ts() }),
+  sortChanged: (column: string, direction: SortDirection): SortChangedEvent => ({
+    type: 'SortChanged',
+    column,
+    direction,
+    timestamp: ts(),
+  }),
 
-  watchedToggled: (url: string, isWatched: boolean): WatchedToggledEvent =>
-    ({ type: 'WatchedToggled', url, isWatched, timestamp: ts() }),
+  watchedToggled: (url: string, isWatched: boolean): WatchedToggledEvent => ({
+    type: 'WatchedToggled',
+    url,
+    isWatched,
+    timestamp: ts(),
+  }),
 
-  themeModeChanged: (mode: ThemeMode): ThemeModeChangedEvent =>
-    ({ type: 'ThemeModeChanged', mode, timestamp: ts() }),
+  themeModeChanged: (mode: ThemeMode): ThemeModeChangedEvent => ({
+    type: 'ThemeModeChanged',
+    mode,
+    timestamp: ts(),
+  }),
 
-  themePaletteChanged: (palette: ThemePalette): ThemePaletteChangedEvent =>
-    ({ type: 'ThemePaletteChanged', palette, timestamp: ts() }),
+  themePaletteChanged: (palette: ThemePalette): ThemePaletteChangedEvent => ({
+    type: 'ThemePaletteChanged',
+    palette,
+    timestamp: ts(),
+  }),
 
-  sectionSelected: (section: string): SectionSelectedEvent =>
-    ({ type: 'SectionSelected', section, timestamp: ts() }),
+  sectionSelected: (section: string): SectionSelectedEvent => ({
+    type: 'SectionSelected',
+    section,
+    timestamp: ts(),
+  }),
 
-  movieOpened: (url: string, title: string): MovieOpenedEvent =>
-    ({ type: 'MovieOpened', url, title, timestamp: ts() }),
+  movieOpened: (url: string, title: string): MovieOpenedEvent => ({
+    type: 'MovieOpened',
+    url,
+    title,
+    timestamp: ts(),
+  }),
 } as const;

@@ -9,7 +9,13 @@
  */
 
 // Ports (interfaces — what the domain NEEDS from the outside world)
-export type { StoragePort, HapticsPort, MediaQueryPort, ServiceWorkerPort, ThemePort } from './ports';
+export type {
+  StoragePort,
+  HapticsPort,
+  MediaQueryPort,
+  ServiceWorkerPort,
+  ThemePort,
+} from './ports';
 
 // Types (discriminated unions, commands, events, branded types)
 export * from './types';

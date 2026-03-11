@@ -22,13 +22,6 @@ export {
   ratingPercentage,
 } from './ratingPolicy';
 
-export {
-  SEARCH_DEBOUNCE_MS,
-  ANNOUNCE_DELAY_MS,
-  HAPTIC_DURATION,
-} from './debouncePolicy';
+export { SEARCH_DEBOUNCE_MS, ANNOUNCE_DELAY_MS, HAPTIC_DURATION } from './debouncePolicy';
 
-export {
-  ROW_HEIGHT_PX,
-  OVERSCAN_ROWS,
-} from './virtualScrollPolicy';
+export { ROW_HEIGHT_PX, OVERSCAN_ROWS } from './virtualScrollPolicy';

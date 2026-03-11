@@ -32,7 +32,12 @@ export function stripArticle(str: string): string {
  */
 export const naturalSortStrategy: SortStrategy = {
   name: 'natural',
-  compare(a: MovieEntry, b: MovieEntry, column: keyof MovieEntry, direction: SortDirection): number {
+  compare(
+    a: MovieEntry,
+    b: MovieEntry,
+    column: keyof MovieEntry,
+    direction: SortDirection,
+  ): number {
     let va: string | number = a[column];
     let vb: string | number = b[column];
 
@@ -55,7 +60,12 @@ export const naturalSortStrategy: SortStrategy = {
  */
 export const ratingFirstSortStrategy: SortStrategy = {
   name: 'rating-first',
-  compare(a: MovieEntry, b: MovieEntry, column: keyof MovieEntry, direction: SortDirection): number {
+  compare(
+    a: MovieEntry,
+    b: MovieEntry,
+    column: keyof MovieEntry,
+    direction: SortDirection,
+  ): number {
     // Primary: rating descending
     if (a.rating !== b.rating) {
       return b.rating - a.rating;

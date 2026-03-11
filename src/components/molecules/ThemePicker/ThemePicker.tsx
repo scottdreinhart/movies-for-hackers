@@ -16,7 +16,12 @@ interface ThemePickerProps {
  * Molecule: compact theme controls for mode (system/dark/light)
  * and palette (default + colorblind-safe options).
  */
-const ThemePicker = memo(function ThemePicker({ mode, palette, onModeChange, onPaletteChange }: ThemePickerProps) {
+const ThemePicker = memo(function ThemePicker({
+  mode,
+  palette,
+  onModeChange,
+  onPaletteChange,
+}: ThemePickerProps) {
   return (
     <div className={styles.picker} role="group" aria-label="Theme settings">
       <div className={styles.segment} role="radiogroup" aria-label="Color mode">

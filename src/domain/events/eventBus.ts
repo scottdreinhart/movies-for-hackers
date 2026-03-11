@@ -20,10 +20,7 @@ type Listener<T extends DomainEvent = DomainEvent> = (event: T) => void;
 export function createEventBus() {
   const listeners = new Map<DomainEventType | '*', Set<Listener>>();
 
-  function on<T extends DomainEvent>(
-    type: T['type'] | '*',
-    listener: Listener<T>,
-  ): () => void {
+  function on<T extends DomainEvent>(type: T['type'] | '*', listener: Listener<T>): () => void {
     if (!listeners.has(type)) {
       listeners.set(type, new Set());
     }

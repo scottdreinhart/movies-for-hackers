@@ -17,7 +17,9 @@ export function useLiveAnnouncer(message: string, delay: number = ANNOUNCE_DELAY
       setAnnounced(message);
     }, delay);
 
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, [message, delay]);
 
   return announced;

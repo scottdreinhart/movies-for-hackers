@@ -41,4 +41,13 @@ export type {
 export { DomainEvents } from './events';
 
 export type { Rating, Year, MovieTitle, MovieUrl } from './brandedTypes';
-export { toRating, toYear, toMovieTitle, toMovieUrl, unwrapRating, unwrapYear, unwrapTitle, unwrapUrl } from './brandedTypes';
+export {
+  toRating,
+  toYear,
+  toMovieTitle,
+  toMovieUrl,
+  unwrapRating,
+  unwrapYear,
+  unwrapTitle,
+  unwrapUrl,
+} from './brandedTypes';

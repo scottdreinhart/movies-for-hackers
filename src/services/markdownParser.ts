@@ -1,5 +1,9 @@
 import type { MovieEntry } from '../types';
 
+// Memoization cache for parse results
+let cachedMarkdownInput = '';
+let cachedResult: MovieEntry[] = [];
+
 /**
  * Parse a single table row into a movie entry object.
  */
@@ -42,8 +46,15 @@ function parseRow(line: string, section: string): MovieEntry | null {
 
 /**
  * Parse raw content into an array of movie entry objects.
+ * Uses memoization to avoid re-parsing unchanged content.
  */
 export function parseMarkdown(md: string): MovieEntry[] {
+  // Cache optimization: if markdown hasn't changed, return cached result
+  if (md === cachedMarkdownInput && cachedResult.length > 0) {
+    return cachedResult;
+  }
+
+  cachedMarkdownInput = md;
   const lines = md.split('\n');
   const entries: MovieEntry[] = [];
   let currentSection = '';
@@ -87,5 +98,6 @@ export function parseMarkdown(md: string): MovieEntry[] {
     }
   }
 
+  cachedResult = entries;
   return entries;
 }

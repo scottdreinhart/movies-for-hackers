@@ -87,7 +87,16 @@ export function assertValidFilterState(filters: FilterState): void {
 
 // ── Sort invariants ────────────────────────────────────────────
 
-const VALID_SORT_COLUMNS = ['title', 'section', 'genre', 'format', 'year', 'rated', 'rating', 'description'] as const;
+const VALID_SORT_COLUMNS = [
+  'title',
+  'section',
+  'genre',
+  'format',
+  'year',
+  'rated',
+  'rating',
+  'description',
+] as const;
 
 export function assertValidSortColumn(column: string): void {
   assert(

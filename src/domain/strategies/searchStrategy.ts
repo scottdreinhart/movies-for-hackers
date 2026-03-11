@@ -25,7 +25,8 @@ const haystackCache = new WeakMap<MovieEntry, string>();
 function getHaystack(entry: MovieEntry): string {
   let h = haystackCache.get(entry);
   if (!h) {
-    h = `${entry.title} ${entry.genre} ${entry.format} ${entry.rated} ${entry.description} ${entry.notes} ${entry.section}`.toLowerCase();
+    h =
+      `${entry.title} ${entry.genre} ${entry.format} ${entry.rated} ${entry.description} ${entry.notes} ${entry.section}`.toLowerCase();
     haystackCache.set(entry, h);
   }
   return h;
